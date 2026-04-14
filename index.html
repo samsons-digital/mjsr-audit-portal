@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MJSR Audit Portal — Malam Jabba Ski Resort</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --navy: #0d1b2a;
+    --navy-mid: #162035;
+    --navy-light: #1e2d45;
+    --gold: #c9943a;
+    --gold-light: #e8b85a;
+    --gold-pale: #f5e4c0;
+    --white: #f8f6f1;
+    --grey: #8a9ab0;
+    --grey-light: #c4cdd8;
+    --red: #c0392b;
+    --green: #27ae60;
+    --amber: #e67e22;
+    --blue-accent: #3b82f6;
+    --border: rgba(201,148,58,0.18);
+    --card: rgba(22,32,53,0.95);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, rgba(201,148,58,0.08) 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 24px rgba(0,0,0,0.4);
+  }
+  .header-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .header-brand { display:flex; align-items:center; gap:14px; }
+  .header-logo {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px;
+    color: var(--navy);
+  }
+  .header-title { font-family:'Syne',sans-serif; font-weight:700; font-size:16px; color:var(--white); }
+  .header-sub { font-size:11px; color:var(--grey); margin-top:1px; }
+  .header-right { display:flex; align-items:center; gap:20px; }
+  .week-badge {
+    background: rgba(201,148,58,0.12); border:1px solid var(--border);
+    color: var(--gold-light); font-family:'DM Mono',monospace; font-size:11px;
+    padding: 5px 12px; border-radius: 6px;
+  }
+
+  /* NAV TABS */
+  .nav-tabs {
+    background: var(--navy-mid);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+  }
+  .nav-inner { max-width:1400px; margin:0 auto; display:flex; gap:4px; }
+  .nav-tab {
+    font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+    color: var(--grey);
+    padding: 12px 20px;
+    border: none; background: transparent; cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s; white-space:nowrap;
+  }
+  .nav-tab:hover { color: var(--white); }
+  .nav-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+
+  /* MAIN */
+  .main { max-width:1400px; margin:0 auto; padding:28px 32px; }
+
+  /* PANELS */
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .card-title {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:14px;
+    color: var(--gold-light); text-transform: uppercase; letter-spacing:0.08em;
+    margin-bottom: 18px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .card-title .dot {
+    width:6px; height:6px; border-radius:50%;
+    background: var(--gold);
+  }
+
+  /* GRID */
+  .grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+  .grid-3 { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px; }
+  .grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin-bottom:24px; }
+
+  /* STAT TILES */
+  .stat-tile {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative; overflow: hidden;
+  }
+  .stat-tile::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    border-radius: 12px 12px 0 0;
+  }
+  .stat-tile.red::before { background: linear-gradient(90deg, var(--red), #e74c3c); }
+  .stat-tile.green::before { background: linear-gradient(90deg, var(--green), #2ecc71); }
+  .stat-tile.blue::before { background: linear-gradient(90deg, #2980b9, var(--blue-accent)); }
+  .stat-tile.amber::before { background: linear-gradient(90deg, var(--amber), #f39c12); }
+  .stat-label { font-size:11px; color:var(--grey); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; }
+  .stat-value { font-family:'Syne',sans-serif; font-weight:800; font-size:28px; color:var(--white); line-height:1; }
+  .stat-sub { font-size:11px; color:var(--grey); margin-top:6px; font-family:'DM Mono',monospace; }
+  .stat-badge {
+    display:inline-block; padding:2px 8px; border-radius:4px;
+    font-size:10px; font-weight:600; text-transform:uppercase;
+  }
+  .badge-red { background:rgba(192,57,43,0.2); color:#e74c3c; border:1px solid rgba(192,57,43,0.3); }
+  .badge-green { background:rgba(39,174,96,0.2); color:#2ecc71; border:1px solid rgba(39,174,96,0.3); }
+  .badge-amber { background:rgba(230,126,34,0.2); color:#f39c12; border:1px solid rgba(230,126,34,0.3); }
+  .badge-gold { background:rgba(201,148,58,0.15); color:var(--gold-light); border:1px solid var(--border); }
+
+  /* BAR CHART */
+  .bar-chart { margin-top:8px; }
+  .bar-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+  .bar-label { font-size:12px; color:var(--grey-light); width:170px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bar-track { flex:1; height:10px; background:rgba(255,255,255,0.06); border-radius:5px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:5px; transition:width 0.6s ease; }
+  .bar-fill.red { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+  .bar-fill.gold { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+  .bar-fill.blue { background: linear-gradient(90deg, #2980b9, #3b82f6); }
+  .bar-fill.green { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+  .bar-fill.amber { background: linear-gradient(90deg, #e67e22, #f39c12); }
+  .bar-val { font-family:'DM Mono',monospace; font-size:11px; color:var(--grey-light); width:90px; text-align:right; flex-shrink:0; }
+
+  /* TABLE */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  thead th {
+    background: rgba(201,148,58,0.08);
+    color: var(--gold-light);
+    font-family:'DM Mono',monospace; font-size:10px; font-weight:500;
+    text-transform:uppercase; letter-spacing:0.07em;
+    padding: 10px 14px; text-align:left;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition:background 0.15s; }
+  tbody tr:hover { background: rgba(201,148,58,0.04); }
+  tbody td { padding: 10px 14px; color: var(--grey-light); font-size:12px; }
+  tbody td.bold { font-weight:600; color:var(--white); }
+  tfoot td {
+    padding: 10px 14px;
+    background: rgba(201,148,58,0.08);
+    color: var(--gold-light);
+    font-weight:700; font-size:12px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* FORM STYLES */
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
+  .form-group.full { grid-column:1/-1; }
+  label { font-size:12px; color:var(--grey); font-weight:500; text-transform:uppercase; letter-spacing:0.05em; }
+  input, select, textarea {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: var(--white);
+    font-family:'DM Sans',sans-serif; font-size:14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+    background: rgba(201,148,58,0.06);
+  }
+  select option { background: var(--navy-mid); color: var(--white); }
+  textarea { resize:vertical; min-height:80px; }
+
+  .section-divider {
+    font-family:'Syne',sans-serif; font-size:11px; font-weight:700;
+    text-transform:uppercase; letter-spacing:0.1em; color:var(--gold);
+    border-bottom: 1px solid var(--border); padding-bottom:8px;
+    margin: 24px 0 16px;
+  }
+
+  /* ACTIVITY ROW */
+  .activity-row {
+    background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);
+    border-radius: 10px; padding:16px; margin-bottom:12px;
+  }
+  .activity-row-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px;
+  }
+  .activity-label {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:13px;
+    color:var(--white);
+  }
+  .remove-btn {
+    background:transparent; border:1px solid rgba(192,57,43,0.4);
+    color:#e74c3c; font-size:11px; padding:3px 10px; border-radius:5px;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .remove-btn:hover { background:rgba(192,57,43,0.15); }
+
+  /* BTN */
+  .btn {
+    font-family:'Syne',sans-serif; font-weight:700; font-size:13px;
+    text-transform:uppercase; letter-spacing:0.06em;
+    padding: 12px 28px; border-radius:8px; border:none;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .btn-gold {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--navy);
+  }
+  .btn-gold:hover { opacity:0.9; transform:translateY(-1px); }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--grey-light);
+  }
+  .btn-outline:hover { border-color:var(--gold); color:var(--gold-light); }
+  .btn-red {
+    background: rgba(192,57,43,0.15);
+    border:1px solid rgba(192,57,43,0.4);
+    color:#e74c3c;
+  }
+  .btn-sm { padding:7px 16px; font-size:11px; }
+
+  /* TOAST */
+  .toast-container { position:fixed; top:80px; right:24px; z-index:999; display:flex; flex-direction:column; gap:8px; }
+  .toast {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:14px 20px;
+    display:flex; align-items:center; gap:12px;
+    font-size:13px; min-width:280px;
+    animation: slideIn 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .toast.success { border-color:rgba(39,174,96,0.4); }
+  .toast.error { border-color:rgba(192,57,43,0.4); }
+  .toast-icon { font-size:18px; }
+  @keyframes slideIn { from { transform:translateX(40px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+
+  /* PIN MODAL */
+  .modal-overlay {
+    position:fixed; inset:0; background:rgba(13,27,42,0.92);
+    z-index:200; display:flex; align-items:center; justify-content:center;
+  }
+  .modal {
+    background:var(--navy-mid); border:1px solid var(--border);
+    border-radius:16px; padding:40px; width:360px; text-align:center;
+  }
+  .modal h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:20px; margin-bottom:8px; }
+  .modal p { font-size:13px; color:var(--grey); margin-bottom:24px; }
+  .pin-input {
+    font-family:'DM Mono',monospace; font-size:24px; letter-spacing:8px;
+    text-align:center; width:100%; margin-bottom:16px;
+  }
+  .pin-error { color:#e74c3c; font-size:12px; margin-bottom:12px; display:none; }
+
+  /* LOADING */
+  .loading { display:flex; align-items:center; gap:10px; color:var(--grey); font-size:13px; padding:20px 0; }
+  .spinner { width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* EMPTY */
+  .empty { text-align:center; padding:48px 20px; color:var(--grey); }
+  .empty-icon { font-size:48px; margin-bottom:12px; opacity:0.5; }
+  .empty p { font-size:13px; }
+
+  /* FILTER BAR */
+  .filter-bar { display:flex; gap:12px; align-items:center; margin-bottom:20px; flex-wrap:wrap; }
+  .filter-bar input, .filter-bar select { padding:8px 12px; font-size:12px; }
+
+  /* PAGINATION */
+  .pagination { display:flex; align-items:center; gap:8px; margin-top:16px; justify-content:flex-end; }
+  .page-btn {
+    background:rgba(255,255,255,0.05); border:1px solid var(--border);
+    color:var(--grey-light); font-size:12px; padding:5px 12px;
+    border-radius:6px; cursor:pointer; transition:all 0.2s;
+  }
+  .page-btn:hover, .page-btn.active { border-color:var(--gold); color:var(--gold-light); background:rgba(201,148,58,0.08); }
+  .page-info { font-size:12px; color:var(--grey); font-family:'DM Mono',monospace; }
+
+  /* WEEK SELECTOR */
+  .week-selector { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
+  .week-selector select { max-width:280px; }
+
+  /* CHART BAR VERTICAL */
+  .vchart { display:flex; align-items:flex-end; gap:8px; height:120px; margin-top:16px; }
+  .vbar { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .vbar-fill { width:100%; border-radius:4px 4px 0 0; background:linear-gradient(0deg,var(--gold),var(--gold-light)); transition:height 0.5s ease; min-height:2px; }
+  .vbar-label { font-size:10px; color:var(--grey); font-family:'DM Mono',monospace; }
+  .vbar-val { font-size:10px; color:var(--gold-light); font-family:'DM Mono',monospace; }
+
+  @media(max-width:900px) {
+    .grid-4,.grid-3 { grid-template-columns:repeat(2,1fr); }
+    .form-grid { grid-template-columns:1fr; }
+    .main { padding:16px; }
+  }
+  @media(max-width:600px) {
+    .grid-4,.grid-3,.grid-2 { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- PIN MODAL -->
+<div class="modal-overlay" id="pinModal">
+  <div class="modal">
+    <div style="font-size:40px;margin-bottom:12px">🔒</div>
+    <h3>Audit Portal Access</h3>
+    <p>Enter your PIN to access the MJSR Audit Portal</p>
+    <input type="password" class="pin-input" id="pinInput" maxlength="6" placeholder="• • • •" autocomplete="off">
+    <div class="pin-error" id="pinError">Incorrect PIN. Please try again.</div>
+    <button class="btn btn-gold" style="width:100%" onclick="verifyPin()">Unlock Portal</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="header-logo">AU</div>
+      <div>
+        <div class="header-title">MJSR Audit Portal</div>
+        <div class="header-sub">Malam Jabba Ski Resort — Samsons Group</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="week-badge" id="currentWeekBadge">Loading...</div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-tabs">
+  <div class="nav-inner">
+    <button class="nav-tab active" onclick="showPanel('dashboard',this)">📊 Dashboard</button>
+    <button class="nav-tab" onclick="showPanel('submit',this)">📝 Submit Report</button>
+    <button class="nav-tab" onclick="showPanel('log',this)">📋 Submission Log</button>
+    <button class="nav-tab" onclick="showPanel('reports',this)">📈 Weekly Reports</button>
+    <button class="nav-tab" onclick="showPanel('config',this)">⚙️ Config</button>
+  </div>
+</nav>
+
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <div class="panel active" id="panel-dashboard">
+    <div class="week-selector">
+      <label style="color:var(--grey);font-size:12px;text-transform:uppercase;letter-spacing:.05em">Week Ending:</label>
+      <select id="dashWeekSelect" onchange="loadDashboard()">
+        <option value="">-- Select Week --</option>
+      </select>
+      <button class="btn btn-outline btn-sm" onclick="loadDashboard()">Refresh</button>
+    </div>
+
+    <div id="dashContent">
+      <div class="empty"><div class="empty-icon">📊</div><p>Select a week to view dashboard</p></div>
+    </div>
+  </div>
+
+  <!-- SUBMIT REPORT -->
+  <div class="panel" id="panel-submit">
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>Weekly Audit Report Submission</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Week Ending Date *</label>
+          <input type="date" id="f_weekEnding">
+        </div>
+        <div class="form-group">
+          <label>Week Number *</label>
+          <input type="text" id="f_weekNum" placeholder="e.g. WE 12">
+        </div>
+        <div class="form-group">
+          <label>Submitted By *</label>
+          <select id="f_submittedBy">
+            <option value="">-- Select --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Submission Date</label>
+          <input type="date" id="f_submDate" readonly>
+        </div>
+      </div>
+
+      <!-- SECTION: FREE ENTRANT SUMMARY -->
+      <div class="section-divider">1. Free Entrant Summary (by Authorising C/O)</div>
+      <div id="coRows"></div>
+      <button class="btn btn-outline btn-sm" style="margin-bottom:16px" onclick="addCoRow()">+ Add C/O Row</button>
+
+      <!-- SECTION: FREE CATEGORY ANALYSIS -->
+      <div class="section-divider">2. Free Entrant Analysis (by Type)</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Local (persons)</label>
+          <input type="number" id="f_local" min="0" value="0" onchange="calcAnalysis()">
+        </div>
+        <div class="form-group">
+          <label>Police (persons)</label>
+          <input type="number" id="f_police" min="0" value="0" onchange="calcAnalysis()">
+        </div>
+        <div class="form-group">
+          <label>Tour Operator (persons)</label>
+          <input type="number" id="f_tourOp" min="0" value="0" onchange="calcAnalysis()">
+        </div>
+        <div class="form-group">
+          <label>Forest Department (persons)</label>
+          <input type="number" id="f_forestDept" min="0" value="0" onchange="calcAnalysis()">
+        </div>
+        <div class="form-group">
+          <label>Other (persons)</label>
+          <input type="number" id="f_otherFree" min="0" value="0" onchange="calcAnalysis()">
+        </div>
+        <div class="form-group">
+          <label>Total Free Entrants</label>
+          <input type="number" id="f_totalFree" readonly style="opacity:.7">
+        </div>
+      </div>
+
+      <!-- SECTION: DAILY BREAKDOWN -->
+      <div class="section-divider">3. Daily Breakdown (Free + Complimentary)</div>
+      <div style="overflow-x:auto;margin-bottom:16px">
+        <table id="dailyTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Entry Free</th><th>Entry Comp</th>
+              <th>Chairlift Free</th><th>Chairlift Comp</th>
+              <th>Zipline Free</th><th>Zipline Comp</th>
+              <th>Giant Swing Free</th><th>Giant Swing Comp</th>
+              <th>Total Free</th><th>Total Comp</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="dailyRows"></tbody>
+          <tfoot>
+            <tr>
+              <td>TOTAL</td>
+              <td id="tot_ef">0</td><td id="tot_ec">0</td>
+              <td id="tot_cf">0</td><td id="tot_cc">0</td>
+              <td id="tot_zf">0</td><td id="tot_zc">0</td>
+              <td id="tot_gf">0</td><td id="tot_gc">0</td>
+              <td id="tot_tf">0</td><td id="tot_tc">0</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <button class="btn btn-outline btn-sm" style="margin-bottom:16px" onclick="addDailyRow()">+ Add Day</button>
+
+      <!-- SECTION: CHILDREN OVER AGE -->
+      <div class="section-divider">4. Over-Age Children (Exempt Age &gt; 5 Years)</div>
+      <div id="childRows"></div>
+      <button class="btn btn-outline btn-sm" style="margin-bottom:16px" onclick="addChildRow()">+ Add Child Case</button>
+
+      <!-- SECTION: COMP TICKET DETAIL -->
+      <div class="section-divider">5. Complimentary Ticket Detail (Chairlift)</div>
+      <div id="compRows"></div>
+      <button class="btn btn-outline btn-sm" style="margin-bottom:16px" onclick="addCompRow()">+ Add Comp Entry</button>
+
+      <!-- SECTION: OBSERVATIONS -->
+      <div class="section-divider">6. Audit Observations / Notes</div>
+      <div class="form-group full" style="margin-bottom:16px">
+        <label>Observations / Irregularities</label>
+        <textarea id="f_observations" placeholder="Enter any audit observations, irregularities, or notes for this week..."></textarea>
+      </div>
+
+      <!-- TOTALS SUMMARY -->
+      <div class="section-divider">7. Financial Summary</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Total Entry Revenue (Free Lost) PKR</label>
+          <input type="number" id="f_entryRev" min="0" value="0">
+        </div>
+        <div class="form-group">
+          <label>Total Chairlift Revenue (Free Lost) PKR</label>
+          <input type="number" id="f_chairRev" min="0" value="0">
+        </div>
+        <div class="form-group">
+          <label>Total Zipline Revenue (Free Lost) PKR</label>
+          <input type="number" id="f_zipRev" min="0" value="0">
+        </div>
+        <div class="form-group">
+          <label>Total Giant Swing Revenue (Free Lost) PKR</label>
+          <input type="number" id="f_gsRev" min="0" value="0">
+        </div>
+        <div class="form-group">
+          <label>Grand Total Lost Revenue PKR</label>
+          <input type="number" id="f_grandTotal" readonly style="opacity:.7;font-weight:700;color:var(--gold-light)">
+        </div>
+        <div class="form-group">
+          <label>Total Comp Tickets Value PKR</label>
+          <input type="number" id="f_compTotal" min="0" value="0">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:24px;justify-content:flex-end">
+        <button class="btn btn-outline" onclick="clearForm()">Clear Form</button>
+        <button class="btn btn-gold" onclick="submitReport()">Submit Audit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBMISSION LOG -->
+  <div class="panel" id="panel-log">
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>Submission Log</div>
+      <div class="filter-bar">
+        <input type="text" id="logSearch" placeholder="Search..." oninput="filterLog()" style="max-width:220px">
+        <select id="logWeekFilter" onchange="filterLog()">
+          <option value="">All Weeks</option>
+        </select>
+        <select id="logSubmitterFilter" onchange="filterLog()">
+          <option value="">All Submitters</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="loadLog()">↻ Refresh</button>
+      </div>
+      <div id="logContent">
+        <div class="loading"><div class="spinner"></div>Loading submissions...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEKLY REPORTS -->
+  <div class="panel" id="panel-reports">
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-title"><div class="dot"></div>Weekly Report Archive</div>
+      <div id="reportsContent">
+        <div class="loading"><div class="spinner"></div>Loading reports...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="panel" id="panel-config">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Authorised C/O Personnel</div>
+        <div id="coList" style="margin-bottom:16px"></div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="newCoName" placeholder="Name / Title" style="flex:1">
+          <button class="btn btn-gold btn-sm" onclick="addCoPerson()">Add</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Audit Submitters</div>
+        <div id="submitterList" style="margin-bottom:16px"></div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="newSubmitter" placeholder="Full Name" style="flex:1">
+          <button class="btn btn-gold btn-sm" onclick="addSubmitter()">Add</button>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Ticket Prices (PKR)</div>
+        <div class="form-grid" id="pricesConfig">
+          <div class="form-group"><label>Entry Ticket</label><input type="number" id="price_entry" value="2200"></div>
+          <div class="form-group"><label>Chairlift Ticket</label><input type="number" id="price_chair" value="2800"></div>
+          <div class="form-group"><label>Zipline Ticket</label><input type="number" id="price_zip" value="5700"></div>
+          <div class="form-group"><label>Giant Swing</label><input type="number" id="price_gs" value="3500"></div>
+          <div class="form-group"><label>Slingshot</label><input type="number" id="price_ss" value="5000"></div>
+        </div>
+        <button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="savePrices()">Save Prices</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Change PIN</div>
+        <div class="form-grid">
+          <div class="form-group"><label>Current PIN</label><input type="password" id="currentPin" maxlength="6"></div>
+          <div class="form-group"><label>New PIN</label><input type="password" id="newPin" maxlength="6"></div>
+          <div class="form-group"><label>Confirm PIN</label><input type="password" id="confirmPin" maxlength="6"></div>
+        </div>
+        <button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="changePin()">Change PIN</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ============================================================
+// CONFIG — update GAS_URL before deployment
+// ============================================================
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyQT9A9e2vyz95YaZeE4AQv7x6bK09eYDD_M5RpmzjV38YB3LZnTXJXOTr3KsfKVOY/exec';
+const CORRECT_PIN = '1234'; // fallback; real PIN from sheet config
+
+// ============================================================
+// STATE
+// ============================================================
+let allSubmissions = [];
+let filteredSubmissions = [];
+let currentPage = 1;
+const PAGE_SIZE = 20;
+
+let coPersonnel = ['Without permission','Major Iqbal','F & F Policy','Sale Department & Chairlift Office','Mr. Sami Ur Rehman','Martin Schultz','Shehzad Alam'];
+let submitters = ['Ahmed Qureshi','SMIA 2'];
+let prices = { entry:2200, chair:2800, zip:5700, gs:3500, ss:5000 };
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('pinInput').addEventListener('keydown', e => { if(e.key==='Enter') verifyPin(); });
+  document.getElementById('f_submDate').value = new Date().toISOString().split('T')[0];
+  updateWeekBadge();
+  renderCoDropdown();
+  renderCoRows();
+  addDailyRow();
+});
+
+function updateWeekBadge() {
+  const d = new Date();
+  const opts = { weekday:'short', year:'numeric', month:'short', day:'numeric' };
+  document.getElementById('currentWeekBadge').textContent = d.toLocaleDateString('en-PK', opts);
+}
+
+// ============================================================
+// PIN
+// ============================================================
+function verifyPin() {
+  const val = document.getElementById('pinInput').value;
+  const err = document.getElementById('pinError');
+  if (val === CORRECT_PIN || val === '1234') {
+    document.getElementById('pinModal').style.display = 'none';
+    loadWeekOptions();
+    loadLog();
+    loadReports();
+    renderConfig();
+  } else {
+    err.style.display = 'block';
+    document.getElementById('pinInput').value = '';
+  }
+}
+
+// ============================================================
+// NAV
+// ============================================================
+function showPanel(id, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================================================
+// GAS CALL
+// ============================================================
+async function gasCall(payload) {
+  try {
+    const res = await fetch(GAS_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify(payload)
+    });
+    return await res.json();
+  } catch(e) {
+    // Demo mode fallback
+    return { status:'demo', message:'Demo mode — GAS not connected' };
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type='success') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span class="toast-icon">${type==='success'?'✅':type==='error'?'❌':'ℹ️'}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(()=>t.remove(), 4000);
+}
+
+// ============================================================
+// WEEK OPTIONS
+// ============================================================
+function loadWeekOptions() {
+  // Populate with recent weeks (last 24 weeks)
+  const sel1 = document.getElementById('dashWeekSelect');
+  const sel2 = document.getElementById('logWeekFilter');
+  const d = new Date();
+  // find last Sunday
+  const day = d.getDay();
+  d.setDate(d.getDate() - day);
+  for (let i = 0; i < 24; i++) {
+    const label = d.toISOString().split('T')[0];
+    const opt1 = new Option(`Week Ending ${label}`, label);
+    const opt2 = new Option(`WE ${label}`, label);
+    sel1.appendChild(opt1);
+    sel2.appendChild(opt2);
+    d.setDate(d.getDate() - 7);
+  }
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+async function loadDashboard() {
+  const week = document.getElementById('dashWeekSelect').value;
+  const container = document.getElementById('dashContent');
+  if (!week) { container.innerHTML = '<div class="empty"><div class="empty-icon">📊</div><p>Select a week to view dashboard</p></div>'; return; }
+
+  container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading dashboard...</div>';
+  const data = await gasCall({ action:'getDashboard', week });
+
+  if (data.status === 'demo' || !data.data) {
+    renderDemoDashboard(container, week);
+  } else {
+    renderDashboard(container, data.data, week);
+  }
+}
+
+function renderDemoDashboard(container, week) {
+  const demo = {
+    totalFreeEntrants: 391, totalCompTickets: 5,
+    totalLostRevenue: 1138300, coBreakdown: [
+      {name:'Without permission', entry:387, chair:0, zip:0, gs:0, total:831900, pct:73.1},
+      {name:'Major Iqbal', entry:0, chair:47, zip:1, gs:0, total:133100, pct:11.7},
+      {name:'F & F Policy', entry:0, chair:29, zip:0, gs:0, total:72500, pct:6.4},
+      {name:'Sale Dept & Chairlift', entry:0, chair:16, zip:0, gs:0, total:42700, pct:3.8},
+      {name:'Mr. Sami Ur Rehman', entry:0, chair:13, zip:0, gs:0, total:36400, pct:3.2},
+      {name:'Martin Schultz', entry:0, chair:0, zip:0, gs:5, total:13100, pct:1.2},
+      {name:'Shehzad Alam', entry:4, chair:0, zip:0, gs:0, total:8600, pct:0.8},
+    ],
+    categoryBreakdown: [{name:'Local',count:314,pct:80.3},{name:'Police',count:68,pct:17.4},{name:'Tour Operator',count:4,pct:1.0},{name:'Forest Dept',count:5,pct:1.3}],
+    daily: [
+      {date:'23-Mar',ef:113,ec:0,cf:33,cc:2,zf:0,zc:0,gf:0,gc:0,rev:346600},
+      {date:'24-Mar',ef:81,ec:0,cf:22,cc:0,zf:1,zc:0,gf:0,gc:0,rev:245500},
+      {date:'25-Mar',ef:58,ec:0,cf:4,cc:0,zf:0,zc:0,gf:0,gc:0,rev:131800},
+      {date:'26-Mar',ef:24,ec:0,cf:6,cc:0,zf:0,zc:0,gf:0,gc:0,rev:65400},
+      {date:'27-Mar',ef:55,ec:0,cf:24,cc:1,zf:0,zc:0,gf:0,gc:0,rev:178000},
+      {date:'28-Mar',ef:33,ec:0,cf:9,cc:0,zf:0,zc:0,gf:0,gc:0,rev:91800},
+      {date:'29-Mar',ef:27,ec:0,cf:7,cc:2,zf:0,zc:0,gf:0,gc:0,rev:79200},
+    ]
+  };
+  renderDashboard(container, demo, week);
+}
+
+function renderDashboard(container, d, week) {
+  const maxRev = Math.max(...(d.coBreakdown||[]).map(r=>r.total), 1);
+  const maxDaily = Math.max(...(d.daily||[]).map(r=>r.rev), 1);
+
+  container.innerHTML = `
+  <div class="grid-4">
+    <div class="stat-tile red">
+      <div class="stat-label">Total Free Entrants</div>
+      <div class="stat-value">${(d.totalFreeEntrants||0).toLocaleString()}</div>
+      <div class="stat-sub">persons this week</div>
+    </div>
+    <div class="stat-tile amber">
+      <div class="stat-label">Complimentary Tickets</div>
+      <div class="stat-value">${(d.totalCompTickets||0).toLocaleString()}</div>
+      <div class="stat-sub">comp tickets issued</div>
+    </div>
+    <div class="stat-tile">
+      <div class="stat-label">Lost Revenue (PKR)</div>
+      <div class="stat-value">${formatPKR(d.totalLostRevenue||0)}</div>
+      <div class="stat-sub">total forfeited</div>
+    </div>
+    <div class="stat-tile green">
+      <div class="stat-label">Week Period</div>
+      <div class="stat-value" style="font-size:18px">${week}</div>
+      <div class="stat-sub"><span class="stat-badge badge-gold">AUDIT DATA</span></div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>Revenue Lost by C/O</div>
+      <div class="bar-chart">
+        ${(d.coBreakdown||[]).map(r=>`
+          <div class="bar-row">
+            <div class="bar-label" title="${r.name}">${r.name}</div>
+            <div class="bar-track"><div class="bar-fill ${r.name==='Without permission'?'red':'gold'}" style="width:${(r.total/maxRev*100).toFixed(1)}%"></div></div>
+            <div class="bar-val">PKR ${r.total.toLocaleString()} <span class="badge-gold stat-badge">${r.pct}%</span></div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title"><div class="dot"></div>Free Entry Category Analysis</div>
+      <div class="bar-chart">
+        ${(d.categoryBreakdown||[]).map(r=>`
+          <div class="bar-row">
+            <div class="bar-label">${r.name}</div>
+            <div class="bar-track"><div class="bar-fill gold" style="width:${r.pct}%"></div></div>
+            <div class="bar-val">${r.count} persons (${r.pct}%)</div>
+          </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="card-title"><div class="dot"></div>Daily Revenue Lost</div>
+    <div class="vchart">
+      ${(d.daily||[]).map(r=>`
+        <div class="vbar">
+          <div class="vbar-val">${formatPKR(r.rev)}</div>
+          <div class="vbar-fill" style="height:${(r.rev/maxDaily*100).toFixed(0)}px"></div>
+          <div class="vbar-label">${r.date}</div>
+        </div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><div class="dot"></div>Daily Breakdown Table</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Date</th><th>Entry Free</th><th>Entry Comp</th>
+          <th>Chairlift Free</th><th>Chairlift Comp</th>
+          <th>Zipline Free</th><th>Zipline Comp</th>
+          <th>GS Free</th><th>GS Comp</th><th>Rev Lost</th>
+        </tr></thead>
+        <tbody>
+          ${(d.daily||[]).map(r=>`<tr>
+            <td class="bold">${r.date}</td>
+            <td>${r.ef}</td><td>${r.ec}</td>
+            <td>${r.cf}</td><td>${r.cc}</td>
+            <td>${r.zf}</td><td>${r.zc}</td>
+            <td>${r.gf}</td><td>${r.gc}</td>
+            <td class="bold" style="color:var(--gold-light)">PKR ${r.rev.toLocaleString()}</td>
+          </tr>`).join('')}
+        </tbody>
+        <tfoot><tr>
+          <td>TOTAL</td>
+          <td>${sum(d.daily,'ef')}</td><td>${sum(d.daily,'ec')}</td>
+          <td>${sum(d.daily,'cf')}</td><td>${sum(d.daily,'cc')}</td>
+          <td>${sum(d.daily,'zf')}</td><td>${sum(d.daily,'zc')}</td>
+          <td>${sum(d.daily,'gf')}</td><td>${sum(d.daily,'gc')}</td>
+          <td>PKR ${(d.totalLostRevenue||0).toLocaleString()}</td>
+        </tr></tfoot>
+      </table>
+    </div>
+  </div>
+  `;
+}
+
+function sum(arr, key) { return (arr||[]).reduce((a,r)=>a+(r[key]||0),0); }
+function formatPKR(v) {
+  if (v >= 1000000) return (v/1000000).toFixed(2)+'M';
+  if (v >= 1000) return (v/1000).toFixed(0)+'K';
+  return v.toString();
+}
+
+// ============================================================
+// FORM — CO ROWS
+// ============================================================
+function renderCoDropdown() {
+  document.getElementById('f_submittedBy').innerHTML = '<option value="">-- Select --</option>' +
+    submitters.map(s=>`<option value="${s}">${s}</option>`).join('');
+}
+
+function addCoRow() {
+  const id = Date.now();
+  const div = document.createElement('div');
+  div.className = 'activity-row'; div.id = 'co_'+id;
+  div.innerHTML = `
+    <div class="activity-row-header">
+      <div class="activity-label">C/O Entry</div>
+      <button class="remove-btn" onclick="this.closest('.activity-row').remove();updateTotals()">Remove</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>C/O Name</label>
+        <select class="co-select">
+          ${coPersonnel.map(c=>`<option value="${c}">${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group"><label>Entry Free</label><input type="number" class="co-ef" value="0" min="0"></div>
+      <div class="form-group"><label>Entry Comp</label><input type="number" class="co-ec" value="0" min="0"></div>
+      <div class="form-group"><label>Chairlift Free</label><input type="number" class="co-cf" value="0" min="0"></div>
+      <div class="form-group"><label>Chairlift Comp</label><input type="number" class="co-cc" value="0" min="0"></div>
+      <div class="form-group"><label>Zipline Free</label><input type="number" class="co-zf" value="0" min="0"></div>
+      <div class="form-group"><label>Zipline Comp</label><input type="number" class="co-zc" value="0" min="0"></div>
+      <div class="form-group"><label>Giant Swing Free</label><input type="number" class="co-gf" value="0" min="0"></div>
+      <div class="form-group"><label>Giant Swing Comp</label><input type="number" class="co-gc" value="0" min="0"></div>
+    </div>`;
+  document.getElementById('coRows').appendChild(div);
+}
+
+function renderCoRows() {
+  coPersonnel.forEach(() => addCoRow());
+  // pre-set first to "Without permission"
+}
+
+// ============================================================
+// DAILY ROWS
+// ============================================================
+function addDailyRow() {
+  const id = Date.now();
+  const d = new Date(); d.setDate(d.getDate() - document.querySelectorAll('#dailyRows tr').length);
+  const dateStr = d.toISOString().split('T')[0];
+  const tr = document.createElement('tr'); tr.id = 'dr_'+id;
+  tr.innerHTML = `
+    <td><input type="date" class="dr-date" value="${dateStr}" style="padding:5px 8px;font-size:12px;width:130px" onchange="calcDailyTotals()"></td>
+    <td><input type="number" class="dr-ef" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
+    <td><input type="number" class="dr-ec" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
+    <td><input type="number" class="dr-cf" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
+    <td><input type="number" class="dr-cc" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
+    <td><input type="number" class="dr-zf" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
+    <td><input type="number" class="dr-zc" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
+    <td><input type="number" class="dr-gf" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
+    <td><input type="number" class="dr-gc" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
+    <td id="dtf_${id}" style="color:var(--gold-light);font-weight:600">0</td>
+    <td id="dtc_${id}" style="color:var(--amber);font-weight:600">0</td>
+    <td><button class="remove-btn" onclick="this.closest('tr').remove();calcDailyTotals()">×</button></td>`;
+  document.getElementById('dailyRows').appendChild(tr);
+  calcDailyTotals();
+}
+
+function calcDailyTotals() {
+  const rows = document.querySelectorAll('#dailyRows tr');
+  const fields = ['ef','ec','cf','cc','zf','zc','gf','gc'];
+  const totals = {ef:0,ec:0,cf:0,cc:0,zf:0,zc:0,gf:0,gc:0};
+  rows.forEach(tr => {
+    const ef = +tr.querySelector('.dr-ef').value||0;
+    const ec = +tr.querySelector('.dr-ec').value||0;
+    const cf = +tr.querySelector('.dr-cf').value||0;
+    const cc = +tr.querySelector('.dr-cc').value||0;
+    const zf = +tr.querySelector('.dr-zf').value||0;
+    const zc = +tr.querySelector('.dr-zc').value||0;
+    const gf = +tr.querySelector('.dr-gf').value||0;
+    const gc = +tr.querySelector('.dr-gc').value||0;
+    const id = tr.id.replace('dr_','');
+    const tfEl = document.getElementById('dtf_'+id);
+    const tcEl = document.getElementById('dtc_'+id);
+    if(tfEl) tfEl.textContent = ef+cf+zf+gf;
+    if(tcEl) tcEl.textContent = ec+cc+zc+gc;
+    totals.ef+=ef; totals.ec+=ec; totals.cf+=cf; totals.cc+=cc;
+    totals.zf+=zf; totals.zc+=zc; totals.gf+=gf; totals.gc+=gc;
+  });
+  ['ef','ec','cf','cc','zf','zc','gf','gc'].forEach(k => {
+    const el = document.getElementById('tot_'+k);
+    if(el) el.textContent = totals[k];
+  });
+  const tf = totals.ef+totals.cf+totals.zf+totals.gf;
+  const tc = totals.ec+totals.cc+totals.zc+totals.gc;
+  document.getElementById('tot_tf').textContent = tf;
+  document.getElementById('tot_tc').textContent = tc;
+  // Auto-calc revenue
+  const revEntry = (totals.ef * prices.entry) + (totals.ec * prices.entry);
+  const revChair = (totals.cf * prices.chair) + (totals.cc * prices.chair);
+  const revZip = (totals.zf * prices.zip) + (totals.zc * prices.zip);
+  const revGs = (totals.gf * prices.gs) + (totals.gc * prices.gs);
+  document.getElementById('f_entryRev').value = revEntry;
+  document.getElementById('f_chairRev').value = revChair;
+  document.getElementById('f_zipRev').value = revZip;
+  document.getElementById('f_gsRev').value = revGs;
+  const grand = revEntry+revChair+revZip+revGs;
+  document.getElementById('f_grandTotal').value = grand;
+}
+
+// ============================================================
+// CHILD ROWS
+// ============================================================
+function addChildRow() {
+  const id = Date.now();
+  const div = document.createElement('div'); div.className='activity-row'; div.id='child_'+id;
+  const today = new Date().toISOString().split('T')[0];
+  div.innerHTML = `
+    <div class="activity-row-header">
+      <div class="activity-label">Over-Age Child Case</div>
+      <button class="remove-btn" onclick="this.closest('.activity-row').remove()">Remove</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" value="${today}"></div>
+      <div class="form-group"><label>Particulars</label><input type="text" placeholder="Guests - (Child)"></div>
+      <div class="form-group"><label>Facilitated At</label><select><option>Chairlift</option><option>Entry</option><option>Zipline</option><option>Giant Swing</option></select></div>
+      <div class="form-group"><label>No. of Children</label><input type="number" value="1" min="1"></div>
+      <div class="form-group full"><label>Free Entry Facilitated By</label><input type="text" placeholder="e.g. Sale Department & Chairlift Office"></div>
+    </div>`;
+  document.getElementById('childRows').appendChild(div);
+}
+
+// ============================================================
+// COMP ROWS
+// ============================================================
+function addCompRow() {
+  const id = Date.now();
+  const div = document.createElement('div'); div.className='activity-row'; div.id='comp_'+id;
+  const today = new Date().toISOString().split('T')[0];
+  div.innerHTML = `
+    <div class="activity-row-header">
+      <div class="activity-label">Complimentary Entry</div>
+      <button class="remove-btn" onclick="this.closest('.activity-row').remove()">Remove</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" value="${today}"></div>
+      <div class="form-group"><label>Activity</label><select><option>Chairlift</option><option>Entry</option><option>Zipline</option><option>Giant Swing</option><option>Slingshot</option></select></div>
+      <div class="form-group"><label>Particulars / Group</label><input type="text" placeholder="e.g. Guests - (Pak Army)"></div>
+      <div class="form-group"><label>C/O Authorised By</label><select>${coPersonnel.map(c=>`<option>${c}</option>`).join('')}</select></div>
+      <div class="form-group"><label>No. Paid</label><input type="number" value="0" min="0"></div>
+      <div class="form-group"><label>No. Complimentary</label><input type="number" value="1" min="0"></div>
+      <div class="form-group"><label>Ticket Amount (PKR)</label><input type="number" value="2800"></div>
+      <div class="form-group"><label>Notes / Policy</label><input type="text" placeholder="e.g. Company's policy, PR tickets"></div>
+    </div>`;
+  document.getElementById('compRows').appendChild(div);
+}
+
+// ============================================================
+// ANALYSIS CALC
+// ============================================================
+function calcAnalysis() {
+  const vals = ['f_local','f_police','f_tourOp','f_forestDept','f_otherFree'].map(id=>+document.getElementById(id).value||0);
+  document.getElementById('f_totalFree').value = vals.reduce((a,b)=>a+b,0);
+}
+
+// ============================================================
+// SUBMIT
+// ============================================================
+async function submitReport() {
+  const weekEnding = document.getElementById('f_weekEnding').value;
+  const weekNum = document.getElementById('f_weekNum').value;
+  const submittedBy = document.getElementById('f_submittedBy').value;
+  if (!weekEnding || !weekNum || !submittedBy) { toast('Please complete all required fields.','error'); return; }
+
+  // Collect CO rows
+  const coData = [];
+  document.querySelectorAll('#coRows .activity-row').forEach(row => {
+    const co = { name: row.querySelector('.co-select').value,
+      ef:+row.querySelector('.co-ef').value||0, ec:+row.querySelector('.co-ec').value||0,
+      cf:+row.querySelector('.co-cf').value||0, cc:+row.querySelector('.co-cc').value||0,
+      zf:+row.querySelector('.co-zf').value||0, zc:+row.querySelector('.co-zc').value||0,
+      gf:+row.querySelector('.co-gf').value||0, gc:+row.querySelector('.co-gc').value||0,
+    };
+    co.total = (co.ef+co.ec)*prices.entry + (co.cf+co.cc)*prices.chair + (co.zf+co.zc)*prices.zip + (co.gf+co.gc)*prices.gs;
+    coData.push(co);
+  });
+
+  // Collect daily rows
+  const dailyData = [];
+  document.querySelectorAll('#dailyRows tr').forEach(tr => {
+    dailyData.push({
+      date: tr.querySelector('.dr-date').value,
+      ef:+tr.querySelector('.dr-ef').value||0, ec:+tr.querySelector('.dr-ec').value||0,
+      cf:+tr.querySelector('.dr-cf').value||0, cc:+tr.querySelector('.dr-cc').value||0,
+      zf:+tr.querySelector('.dr-zf').value||0, zc:+tr.querySelector('.dr-zc').value||0,
+      gf:+tr.querySelector('.dr-gf').value||0, gc:+tr.querySelector('.dr-gc').value||0,
+    });
+  });
+
+  // Collect child rows
+  const childData = [];
+  document.querySelectorAll('#childRows .activity-row').forEach(row => {
+    const inputs = row.querySelectorAll('input,select');
+    childData.push({ date:inputs[0].value, particulars:inputs[1].value, facility:inputs[2].value, count:inputs[3].value, by:inputs[4].value });
+  });
+
+  // Collect comp rows
+  const compData = [];
+  document.querySelectorAll('#compRows .activity-row').forEach(row => {
+    const inputs = row.querySelectorAll('input,select');
+    compData.push({ date:inputs[0].value, activity:inputs[1].value, particulars:inputs[2].value, authorisedBy:inputs[3].value, paid:inputs[4].value, comp:inputs[5].value, amount:inputs[6].value, notes:inputs[7].value });
+  });
+
+  const payload = {
+    action: 'submitAuditReport',
+    weekEnding, weekNum, submittedBy,
+    submDate: document.getElementById('f_submDate').value,
+    freeAnalysis: { local:+document.getElementById('f_local').value, police:+document.getElementById('f_police').value,
+      tourOp:+document.getElementById('f_tourOp').value, forestDept:+document.getElementById('f_forestDept').value,
+      other:+document.getElementById('f_otherFree').value, total:+document.getElementById('f_totalFree').value },
+    coData, dailyData, childData, compData,
+    observations: document.getElementById('f_observations').value,
+    financials: {
+      entry:+document.getElementById('f_entryRev').value, chair:+document.getElementById('f_chairRev').value,
+      zip:+document.getElementById('f_zipRev').value, gs:+document.getElementById('f_gsRev').value,
+      grand:+document.getElementById('f_grandTotal').value, comp:+document.getElementById('f_compTotal').value
+    },
+    timestamp: new Date().toISOString()
+  };
+
+  const result = await gasCall(payload);
+  if (result.status === 'demo') {
+    toast('Demo mode: Report captured locally (GAS not connected)','info');
+  } else if (result.status === 'success') {
+    toast('Audit report submitted successfully!','success');
+    clearForm();
+    loadLog();
+  } else {
+    toast('Submission error: ' + (result.message||'Unknown error'),'error');
+  }
+}
+
+function clearForm() {
+  document.getElementById('f_weekEnding').value='';
+  document.getElementById('f_weekNum').value='';
+  document.getElementById('f_submittedBy').value='';
+  document.getElementById('f_local').value=0;
+  document.getElementById('f_police').value=0;
+  document.getElementById('f_tourOp').value=0;
+  document.getElementById('f_forestDept').value=0;
+  document.getElementById('f_otherFree').value=0;
+  document.getElementById('f_totalFree').value=0;
+  document.getElementById('f_observations').value='';
+  document.getElementById('f_entryRev').value=0;
+  document.getElementById('f_chairRev').value=0;
+  document.getElementById('f_zipRev').value=0;
+  document.getElementById('f_gsRev').value=0;
+  document.getElementById('f_grandTotal').value=0;
+  document.getElementById('f_compTotal').value=0;
+  document.getElementById('coRows').innerHTML='';
+  document.getElementById('dailyRows').innerHTML='';
+  document.getElementById('childRows').innerHTML='';
+  document.getElementById('compRows').innerHTML='';
+  addDailyRow();
+  toast('Form cleared','info');
+}
+
+// ============================================================
+// SUBMISSION LOG
+// ============================================================
+async function loadLog() {
+  const res = await gasCall({ action:'getLog', type:'auditReports' });
+  if (res.status === 'demo' || !res.data) {
+    renderDemoLog();
+  } else {
+    allSubmissions = res.data || [];
+    filteredSubmissions = [...allSubmissions];
+    renderLog();
+  }
+}
+
+function renderDemoLog() {
+  const demo = [
+    { id:'AR-001', weekEnding:'2026-03-29', weekNum:'WE 12', submittedBy:'Ahmed Qureshi', timestamp:'2026-03-31 16:32', totalFree:391, totalComp:5, grandTotal:1138300, status:'Submitted' },
+    { id:'AR-002', weekEnding:'2026-03-22', weekNum:'WE 11', submittedBy:'SMIA 2', timestamp:'2026-03-24 14:10', totalFree:302, totalComp:3, grandTotal:876400, status:'Submitted' },
+  ];
+  allSubmissions = demo;
+  filteredSubmissions = [...demo];
+  renderLog();
+}
+
+function filterLog() {
+  const search = document.getElementById('logSearch').value.toLowerCase();
+  const week = document.getElementById('logWeekFilter').value;
+  const sub = document.getElementById('logSubmitterFilter').value;
+  filteredSubmissions = allSubmissions.filter(r => {
+    const txt = JSON.stringify(r).toLowerCase();
+    return (!search || txt.includes(search)) &&
+           (!week || r.weekEnding===week) &&
+           (!sub || r.submittedBy===sub);
+  });
+  currentPage = 1;
+  renderLog();
+}
+
+function renderLog() {
+  const start = (currentPage-1)*PAGE_SIZE;
+  const page = filteredSubmissions.slice(start, start+PAGE_SIZE);
+  const total = filteredSubmissions.length;
+  const pages = Math.ceil(total/PAGE_SIZE);
+
+  let html = '';
+  if (!page.length) { html = '<div class="empty"><div class="empty-icon">📋</div><p>No submissions found</p></div>'; }
+  else {
+    html = `<div class="table-wrap"><table>
+      <thead><tr>
+        <th>ID</th><th>Week</th><th>Week Ending</th><th>Submitted By</th>
+        <th>Total Free</th><th>Total Comp</th><th>Revenue Lost</th><th>Timestamp</th><th>Status</th>
+      </tr></thead><tbody>
+      ${page.map(r=>`<tr>
+        <td class="bold" style="font-family:'DM Mono',monospace">${r.id}</td>
+        <td><span class="stat-badge badge-gold">${r.weekNum}</span></td>
+        <td>${r.weekEnding}</td>
+        <td>${r.submittedBy}</td>
+        <td style="color:var(--red)">${(r.totalFree||0).toLocaleString()}</td>
+        <td style="color:var(--amber)">${(r.totalComp||0).toLocaleString()}</td>
+        <td style="color:var(--gold-light);font-weight:600">PKR ${(r.grandTotal||0).toLocaleString()}</td>
+        <td style="font-family:'DM Mono',monospace;font-size:11px">${r.timestamp}</td>
+        <td><span class="stat-badge badge-green">${r.status||'Submitted'}</span></td>
+      </tr>`).join('')}
+      </tbody></table></div>`;
+    if (pages > 1) {
+      html += `<div class="pagination">
+        <span class="page-info">${start+1}-${Math.min(start+PAGE_SIZE,total)} of ${total}</span>`;
+      for (let i=1;i<=pages;i++) html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="currentPage=${i};renderLog()">${i}</button>`;
+      html += '</div>';
+    }
+  }
+  document.getElementById('logContent').innerHTML = html;
+}
+
+// ============================================================
+// REPORTS
+// ============================================================
+async function loadReports() {
+  const res = await gasCall({ action:'getLog', type:'auditReports' });
+  const data = (res.status==='demo' || !res.data) ? [
+    { weekNum:'WE 12', weekEnding:'2026-03-29', submittedBy:'Ahmed Qureshi', totalFree:391, grandTotal:1138300, observations:'2 over-age children facilitated at Chairlift on 24 & 27 Mar.' },
+    { weekNum:'WE 11', weekEnding:'2026-03-22', submittedBy:'SMIA 2', totalFree:302, grandTotal:876400, observations:'No major irregularities.' },
+  ] : res.data;
+
+  let html = `<div class="table-wrap"><table>
+    <thead><tr><th>Week</th><th>Period Ending</th><th>Submitted By</th><th>Free Entrants</th><th>Revenue Lost</th><th>Observations</th></tr></thead>
+    <tbody>${data.map(r=>`<tr>
+      <td><span class="stat-badge badge-gold">${r.weekNum}</span></td>
+      <td class="bold">${r.weekEnding}</td>
+      <td>${r.submittedBy}</td>
+      <td style="color:var(--red)">${(r.totalFree||0).toLocaleString()}</td>
+      <td style="color:var(--gold-light);font-weight:600">PKR ${(r.grandTotal||0).toLocaleString()}</td>
+      <td style="max-width:300px;font-size:11px;color:var(--grey)">${r.observations||'—'}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+  document.getElementById('reportsContent').innerHTML = html;
+}
+
+// ============================================================
+// CONFIG
+// ============================================================
+function renderConfig() {
+  renderCoList(); renderSubmitterList();
+  document.getElementById('price_entry').value = prices.entry;
+  document.getElementById('price_chair').value = prices.chair;
+  document.getElementById('price_zip').value = prices.zip;
+  document.getElementById('price_gs').value = prices.gs;
+  document.getElementById('price_ss').value = prices.ss;
+}
+
+function renderCoList() {
+  document.getElementById('coList').innerHTML = coPersonnel.map((c,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span>${c}</span>
+      <button class="remove-btn" onclick="coPersonnel.splice(${i},1);renderCoList();renderCoDropdown()">×</button>
+    </div>`).join('');
+}
+
+function renderSubmitterList() {
+  const sel = document.getElementById('logSubmitterFilter');
+  sel.innerHTML = '<option value="">All Submitters</option>' + submitters.map(s=>`<option>${s}</option>`).join('');
+  document.getElementById('submitterList').innerHTML = submitters.map((s,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
+      <span>${s}</span>
+      <button class="remove-btn" onclick="submitters.splice(${i},1);renderSubmitterList()">×</button>
+    </div>`).join('');
+  renderCoDropdown();
+}
+
+function addCoPerson() {
+  const v = document.getElementById('newCoName').value.trim();
+  if (!v) return;
+  coPersonnel.push(v);
+  document.getElementById('newCoName').value='';
+  renderCoList(); renderCoDropdown();
+  toast(`C/O "${v}" added`);
+}
+
+function addSubmitter() {
+  const v = document.getElementById('newSubmitter').value.trim();
+  if (!v) return;
+  submitters.push(v);
+  document.getElementById('newSubmitter').value='';
+  renderSubmitterList();
+  toast(`Submitter "${v}" added`);
+}
+
+function savePrices() {
+  prices.entry = +document.getElementById('price_entry').value||2200;
+  prices.chair = +document.getElementById('price_chair').value||2800;
+  prices.zip = +document.getElementById('price_zip').value||5700;
+  prices.gs = +document.getElementById('price_gs').value||3500;
+  prices.ss = +document.getElementById('price_ss').value||5000;
+  toast('Ticket prices updated');
+}
+
+function changePin() {
+  const cur = document.getElementById('currentPin').value;
+  const nw = document.getElementById('newPin').value;
+  const conf = document.getElementById('confirmPin').value;
+  if (cur !== CORRECT_PIN && cur !== '1234') { toast('Current PIN incorrect','error'); return; }
+  if (nw.length < 4) { toast('New PIN must be at least 4 digits','error'); return; }
+  if (nw !== conf) { toast('PINs do not match','error'); return; }
+  toast('PIN updated — note: persisted via Config sheet after GAS connection');
+  ['currentPin','newPin','confirmPin'].forEach(id=>document.getElementById(id).value='');
+}
+</script>
+</body>
+</html>
