@@ -599,11 +599,11 @@
       <div class="form-grid">
         <div class="form-group">
           <label>Week Ending Date *</label>
-          <input type="date" id="f_weekEnding">
+          <input type="date" id="f_weekEnding" onchange="onWeekEndingChange()">
         </div>
         <div class="form-group">
-          <label>Week Number *</label>
-          <input type="text" id="f_weekNum" placeholder="e.g. WE 12">
+          <label>Week Number <span style="color:var(--gold);font-size:10px">(auto)</span></label>
+          <input type="text" id="f_weekNum" placeholder="Auto-fills from date" readonly style="opacity:.8;background:rgba(0,0,0,0.04)">
         </div>
         <div class="form-group">
           <label>Submitted By *</label>
@@ -615,6 +615,16 @@
           <label>Submission Date</label>
           <input type="date" id="f_submDate" readonly>
         </div>
+      </div>
+
+      <!-- RATE TYPE INDICATOR -->
+      <div id="f_rateIndicator" style="display:none;margin-bottom:16px;padding:10px 16px;border-radius:8px;display:flex;align-items:center;gap:10px">
+        <span id="f_rateIcon" style="font-size:18px"></span>
+        <div>
+          <div id="f_rateTitle" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em"></div>
+          <div id="f_rateSub" style="font-size:11px;margin-top:1px"></div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:16px" id="f_ratePrices"></div>
       </div>
 
       <!-- SECTION: FREE ENTRANT SUMMARY -->
@@ -976,14 +986,51 @@
     <div class="grid-2">
       <div class="card">
         <div class="card-title"><div class="dot"></div>Ticket Prices (PKR)</div>
-        <div class="form-grid" id="pricesConfig">
-          <div class="form-group"><label>Entry Ticket</label><input type="number" id="price_entry" value="2200"></div>
-          <div class="form-group"><label>Chairlift Ticket</label><input type="number" id="price_chair" value="2800"></div>
-          <div class="form-group"><label>Zipline Ticket</label><input type="number" id="price_zip" value="5700"></div>
-          <div class="form-group"><label>Giant Swing</label><input type="number" id="price_gs" value="3500"></div>
-          <div class="form-group"><label>Slingshot</label><input type="number" id="price_ss" value="5000"></div>
+        <div style="font-size:11px;color:var(--grey);margin-bottom:14px">Mon–Thu = Weekday rate &nbsp;·&nbsp; Fri–Sun = Weekend rate. All price changes are audited.</div>
+
+        <!-- Price grid header -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:6px">
+          <div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;padding-left:2px">Activity</div>
+          <div style="font-size:10px;color:#1a5276;text-transform:uppercase;letter-spacing:.05em;text-align:center">Weekday (Mon–Thu)</div>
+          <div style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:.05em;text-align:center">Weekend (Fri–Sun)</div>
         </div>
-        <button class="btn btn-gold btn-sm" style="margin-top:12px" onclick="savePrices()">Save Prices</button>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center" id="pricesConfig">
+          <div style="font-size:12px;font-weight:600;color:var(--white)">Entry</div>
+          <input type="number" id="price_entry_wd" value="2200" style="text-align:center;border-color:rgba(26,82,118,0.3)">
+          <input type="number" id="price_entry_we" value="2200" style="text-align:center;border-color:rgba(184,146,46,0.3)">
+
+          <div style="font-size:12px;font-weight:600;color:var(--white)">Chairlift</div>
+          <input type="number" id="price_chair_wd" value="2500" style="text-align:center;border-color:rgba(26,82,118,0.3)">
+          <input type="number" id="price_chair_we" value="2800" style="text-align:center;border-color:rgba(184,146,46,0.3)">
+
+          <div style="font-size:12px;font-weight:600;color:var(--white)">Zipline</div>
+          <input type="number" id="price_zip_wd" value="4500" style="text-align:center;border-color:rgba(26,82,118,0.3)">
+          <input type="number" id="price_zip_we" value="5700" style="text-align:center;border-color:rgba(184,146,46,0.3)">
+
+          <div style="font-size:12px;font-weight:600;color:var(--white)">Giant Swing</div>
+          <input type="number" id="price_gs_wd" value="2800" style="text-align:center;border-color:rgba(26,82,118,0.3)">
+          <input type="number" id="price_gs_we" value="3500" style="text-align:center;border-color:rgba(184,146,46,0.3)">
+
+          <div style="font-size:12px;font-weight:600;color:var(--white)">Slingshot</div>
+          <input type="number" id="price_ss_wd" value="4000" style="text-align:center;border-color:rgba(26,82,118,0.3)">
+          <input type="number" id="price_ss_we" value="5000" style="text-align:center;border-color:rgba(184,146,46,0.3)">
+        </div>
+
+        <div class="form-group" style="margin-top:14px">
+          <label>Reason for Change (required for audit log)</label>
+          <input type="text" id="price_changeReason" placeholder="e.g. Season price review April 2026">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+          <button class="btn btn-gold btn-sm" onclick="savePrices()">Save Prices</button>
+          <button class="btn btn-outline btn-sm" onclick="togglePriceLog()">📋 Audit Log</button>
+        </div>
+
+        <!-- Price audit log -->
+        <div id="priceAuditLog" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Price Change History</div>
+          <div id="priceAuditRows"><div style="font-size:12px;color:var(--grey)">Loading...</div></div>
+        </div>
       </div>
       <div class="card">
         <div class="card-title"><div class="dot"></div>Change PIN</div>
@@ -1016,7 +1063,11 @@ const PAGE_SIZE = 20;
 
 let coPersonnel = ['Without permission','Major Iqbal','F & F Policy','Sale Department & Chairlift Office','Mr. Sami Ur Rehman','Martin Schultz','Shehzad Alam'];
 let submitters = ['Ahmed Qureshi','SMIA 2'];
-let prices = { entry:2200, chair:2800, zip:5700, gs:3500, ss:5000 };
+let prices = {
+  wd: { entry:2200, chair:2500, zip:4500, gs:2800, ss:4000 },
+  we: { entry:2200, chair:2800, zip:5700, gs:3500, ss:5000 }
+};
+let priceAuditHistory = [];
 
 // ============================================================
 // INIT
@@ -1453,7 +1504,10 @@ function addDailyRow() {
   const tr = document.createElement('tr'); tr.id = 'dr_'+id;
   tr.innerHTML = `
     <td><input type="date" class="dr-date" value="${dateStr}" style="padding:5px 8px;font-size:12px;width:130px" onchange="calcDailyTotals()"></td>
-    <td><input type="time" class="dr-arrtime" style="padding:5px 8px;font-size:12px;width:100px" title="Arrival time of first guest group — used for CCTV cross-reference if required"></td>
+    <td style="white-space:nowrap">
+      <input type="time" class="dr-arrtime" style="padding:5px 8px;font-size:12px;width:95px" title="Arrival time — used for CCTV cross-reference">
+      <span class="dr-rate-badge" style="font-size:9px;font-weight:700;padding:2px 6px;border:1px solid rgba(0,0,0,0.15);border-radius:10px;margin-left:4px;vertical-align:middle;color:var(--grey)"></span>
+    </td>
     <td><input type="number" class="dr-ef" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
     <td><input type="number" class="dr-ec" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
     <td><input type="number" class="dr-cf" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
@@ -1462,7 +1516,7 @@ function addDailyRow() {
     <td><input type="number" class="dr-zc" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
     <td><input type="number" class="dr-gf" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
     <td><input type="number" class="dr-gc" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
-    <td id="dtf_${id}" style="color:var(--gold-light);font-weight:600">0</td>
+    <td id="dtf_${id}" style="color:var(--gold);font-weight:600">0</td>
     <td id="dtc_${id}" style="color:var(--amber);font-weight:600">0</td>
     <td><button class="remove-btn" onclick="this.closest('tr').remove();calcDailyTotals()">×</button></td>`;
   document.getElementById('dailyRows').appendChild(tr);
@@ -1471,9 +1525,11 @@ function addDailyRow() {
 
 function calcDailyTotals() {
   const rows = document.querySelectorAll('#dailyRows tr');
-  const fields = ['ef','ec','cf','cc','zf','zc','gf','gc'];
   const totals = {ef:0,ec:0,cf:0,cc:0,zf:0,zc:0,gf:0,gc:0};
+  let totalRev = 0;
+
   rows.forEach(tr => {
+    const dateVal = tr.querySelector('.dr-date')?.value || '';
     const ef = +tr.querySelector('.dr-ef').value||0;
     const ec = +tr.querySelector('.dr-ec').value||0;
     const cf = +tr.querySelector('.dr-cf').value||0;
@@ -1482,14 +1538,35 @@ function calcDailyTotals() {
     const zc = +tr.querySelector('.dr-zc').value||0;
     const gf = +tr.querySelector('.dr-gf').value||0;
     const gc = +tr.querySelector('.dr-gc').value||0;
+
+    // Per-date WD/WE pricing
+    const ep = getPriceForDate('entry', dateVal);
+    const cp = getPriceForDate('chair', dateVal);
+    const zp = getPriceForDate('zip',   dateVal);
+    const gp = getPriceForDate('gs',    dateVal);
+    const rowRev = (ef+ec)*ep + (cf+cc)*cp + (zf+zc)*zp + (gf+gc)*gp;
+    totalRev += rowRev;
+
+    // Show WD/WE rate badge on each row
     const id = tr.id.replace('dr_','');
     const tfEl = document.getElementById('dtf_'+id);
     const tcEl = document.getElementById('dtc_'+id);
     if(tfEl) tfEl.textContent = ef+cf+zf+gf;
     if(tcEl) tcEl.textContent = ec+cc+zc+gc;
+
+    // Show rate type badge in arrival time cell
+    const rateBadge = tr.querySelector('.dr-rate-badge');
+    if (rateBadge && dateVal) {
+      const isWE = isWeekend(dateVal);
+      rateBadge.textContent = isWE ? 'WE' : 'WD';
+      rateBadge.style.color = isWE ? 'var(--gold)' : '#1a5276';
+      rateBadge.style.borderColor = isWE ? 'rgba(184,146,46,0.4)' : 'rgba(26,82,118,0.3)';
+    }
+
     totals.ef+=ef; totals.ec+=ec; totals.cf+=cf; totals.cc+=cc;
     totals.zf+=zf; totals.zc+=zc; totals.gf+=gf; totals.gc+=gc;
   });
+
   ['ef','ec','cf','cc','zf','zc','gf','gc'].forEach(k => {
     const el = document.getElementById('tot_'+k);
     if(el) el.textContent = totals[k];
@@ -1498,17 +1575,24 @@ function calcDailyTotals() {
   const tc = totals.ec+totals.cc+totals.zc+totals.gc;
   document.getElementById('tot_tf').textContent = tf;
   document.getElementById('tot_tc').textContent = tc;
-  // Auto-calc revenue
-  const revEntry = (totals.ef * prices.entry) + (totals.ec * prices.entry);
-  const revChair = (totals.cf * prices.chair) + (totals.cc * prices.chair);
-  const revZip = (totals.zf * prices.zip) + (totals.zc * prices.zip);
-  const revGs = (totals.gf * prices.gs) + (totals.gc * prices.gs);
+
+  // Distribute rev estimate across form fields
+  // Use blended: calculate per-activity using average of WD/WE (simplified for totals row)
+  const avgEntry = (prices.wd.entry + prices.we.entry) / 2;
+  const avgChair = (prices.wd.chair + prices.we.chair) / 2;
+  const avgZip   = (prices.wd.zip   + prices.we.zip)   / 2;
+  const avgGs    = (prices.wd.gs    + prices.we.gs)     / 2;
+
+  const revEntry = Math.round((totals.ef+totals.ec)*avgEntry);
+  const revChair = Math.round((totals.cf+totals.cc)*avgChair);
+  const revZip   = Math.round((totals.zf+totals.zc)*avgZip);
+  const revGs    = Math.round((totals.gf+totals.gc)*avgGs);
+
   document.getElementById('f_entryRev').value = revEntry;
   document.getElementById('f_chairRev').value = revChair;
-  document.getElementById('f_zipRev').value = revZip;
-  document.getElementById('f_gsRev').value = revGs;
-  const grand = revEntry+revChair+revZip+revGs;
-  document.getElementById('f_grandTotal').value = grand;
+  document.getElementById('f_zipRev').value   = revZip;
+  document.getElementById('f_gsRev').value    = revGs;
+  document.getElementById('f_grandTotal').value = revEntry+revChair+revZip+revGs;
 }
 
 // ============================================================
@@ -1773,14 +1857,210 @@ async function loadReports() {
 // ============================================================
 function renderConfig() {
   renderCoList(); renderSubmitterList();
-  document.getElementById('price_entry').value = prices.entry;
-  document.getElementById('price_chair').value = prices.chair;
-  document.getElementById('price_zip').value = prices.zip;
-  document.getElementById('price_gs').value = prices.gs;
-  document.getElementById('price_ss').value = prices.ss;
+  document.getElementById('price_entry_wd').value = prices.wd.entry;
+  document.getElementById('price_chair_wd').value = prices.wd.chair;
+  document.getElementById('price_zip_wd').value   = prices.wd.zip;
+  document.getElementById('price_gs_wd').value    = prices.wd.gs;
+  document.getElementById('price_ss_wd').value    = prices.wd.ss;
+  document.getElementById('price_entry_we').value = prices.we.entry;
+  document.getElementById('price_chair_we').value = prices.we.chair;
+  document.getElementById('price_zip_we').value   = prices.we.zip;
+  document.getElementById('price_gs_we').value    = prices.we.gs;
+  document.getElementById('price_ss_we').value    = prices.we.ss;
 }
 
-function renderCoList() {
+async function savePrices() {
+  const reason = document.getElementById('price_changeReason').value.trim();
+  if (!reason) { toast('Please enter a reason for the price change — required for audit log', 'error'); return; }
+
+  const prev = JSON.parse(JSON.stringify(prices));
+
+  const newWd = {
+    entry: +document.getElementById('price_entry_wd').value||2200,
+    chair: +document.getElementById('price_chair_wd').value||2500,
+    zip:   +document.getElementById('price_zip_wd').value||4500,
+    gs:    +document.getElementById('price_gs_wd').value||2800,
+    ss:    +document.getElementById('price_ss_wd').value||4000,
+  };
+  const newWe = {
+    entry: +document.getElementById('price_entry_we').value||2200,
+    chair: +document.getElementById('price_chair_we').value||2800,
+    zip:   +document.getElementById('price_zip_we').value||5700,
+    gs:    +document.getElementById('price_gs_we').value||3500,
+    ss:    +document.getElementById('price_ss_we').value||5000,
+  };
+
+  // Build change summary
+  const acts = ['entry','chair','zip','gs','ss'];
+  const labels = {entry:'Entry',chair:'Chairlift',zip:'Zipline',gs:'Giant Swing',ss:'Slingshot'};
+  const changes = [];
+  acts.forEach(a => {
+    if (newWd[a] !== prev.wd[a]) changes.push(`${labels[a]} WD: ${prev.wd[a]} → ${newWd[a]}`);
+    if (newWe[a] !== prev.we[a]) changes.push(`${labels[a]} WE: ${prev.we[a]} → ${newWe[a]}`);
+  });
+
+  if (!changes.length) { toast('No price changes detected', 'info'); return; }
+
+  prices.wd = newWd;
+  prices.we = newWe;
+
+  // Build audit record
+  const auditEntry = {
+    timestamp: new Date().toISOString(),
+    reason,
+    changes: changes.join(' | '),
+    changedBy: document.getElementById('f_submittedBy')?.value || 'Config',
+    prevWd: JSON.stringify(prev.wd),
+    prevWe: JSON.stringify(prev.we),
+    newWd: JSON.stringify(newWd),
+    newWe: JSON.stringify(newWe),
+  };
+  priceAuditHistory.unshift(auditEntry);
+
+  // Persist to GAS
+  await gasCall({ action:'savePriceAudit', entry: auditEntry, currentPrices: prices });
+
+  document.getElementById('price_changeReason').value = '';
+  toast(`Prices updated — ${changes.length} change${changes.length>1?'s':''} recorded in audit log`);
+  renderPriceAuditLog();
+
+  // Update revenue calc if form is open
+  if (document.getElementById('f_weekEnding').value) onWeekEndingChange();
+}
+
+function togglePriceLog() {
+  const el = document.getElementById('priceAuditLog');
+  const showing = el.style.display !== 'none';
+  el.style.display = showing ? 'none' : 'block';
+  if (!showing) renderPriceAuditLog();
+}
+
+async function renderPriceAuditLog() {
+  const container = document.getElementById('priceAuditRows');
+  if (!container) return;
+
+  // Load from GAS if empty
+  if (!priceAuditHistory.length) {
+    const res = await gasCall({ action:'getPriceAudit' });
+    if (res.status === 'success' && res.data?.length) {
+      priceAuditHistory = res.data;
+    }
+  }
+
+  if (!priceAuditHistory.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--grey);padding:8px 0">No price changes recorded yet.</div>';
+    return;
+  }
+
+  container.innerHTML = priceAuditHistory.slice(0,10).map(r=>`
+    <div style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--grey)">${r.timestamp?.substring(0,16).replace('T',' ')||'—'}</div>
+        <div style="font-size:11px;color:var(--gold)">${r.changedBy||'—'}</div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--white);margin:3px 0">${r.reason||'—'}</div>
+      <div style="font-size:11px;color:var(--grey-light)">${r.changes||'—'}</div>
+    </div>`).join('');
+}
+
+// ============================================================
+// WEEK NUMBER AUTO-POPULATE + RATE INDICATOR
+// ============================================================
+function onWeekEndingChange() {
+  const val = document.getElementById('f_weekEnding').value;
+  if (!val) {
+    document.getElementById('f_weekNum').value = '';
+    document.getElementById('f_rateIndicator').style.display = 'none';
+    return;
+  }
+
+  // Auto-calculate week number (ISO week of the year)
+  const d = new Date(val);
+  const weekNum = getISOWeek(d);
+  document.getElementById('f_weekNum').value = 'WE ' + weekNum;
+
+  // Determine if week contains any weekdays and/or weekend days
+  // The week ending date is typically a Sunday (end of week)
+  // Check the 7-day window ending on this date
+  const weekStart = new Date(d);
+  weekStart.setDate(d.getDate() - 6);
+
+  let hasWeekday = false, hasWeekend = false;
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(weekStart);
+    day.setDate(weekStart.getDate() + i);
+    const dow = day.getDay(); // 0=Sun, 1=Mon...6=Sat
+    if (dow === 0 || dow === 5 || dow === 6) hasWeekend = true; // Fri=5, Sat=6, Sun=0
+    else hasWeekday = true;
+  }
+
+  // Show rate indicator
+  const ind = document.getElementById('f_rateIndicator');
+  ind.style.display = 'flex';
+
+  if (hasWeekday && hasWeekend) {
+    ind.style.background = 'rgba(184,146,46,0.08)';
+    ind.style.border = '1px solid rgba(184,146,46,0.25)';
+    document.getElementById('f_rateIcon').textContent = '📅';
+    document.getElementById('f_rateTitle').style.color = 'var(--gold)';
+    document.getElementById('f_rateTitle').textContent = 'Mixed Week — Weekday + Weekend Rates Apply';
+    document.getElementById('f_rateSub').style.color = 'var(--grey)';
+    document.getElementById('f_rateSub').textContent = 'Mon–Thu at weekday rates · Fri–Sun at weekend rates';
+  } else if (hasWeekend) {
+    ind.style.background = 'rgba(184,146,46,0.1)';
+    ind.style.border = '1px solid rgba(184,146,46,0.3)';
+    document.getElementById('f_rateIcon').textContent = '🏔️';
+    document.getElementById('f_rateTitle').style.color = 'var(--gold)';
+    document.getElementById('f_rateTitle').textContent = 'Weekend Rates Active (Fri–Sun)';
+    document.getElementById('f_rateSub').style.color = 'var(--grey)';
+    document.getElementById('f_rateSub').textContent = 'Higher weekend pricing applies for this period';
+  } else {
+    ind.style.background = 'rgba(26,82,118,0.08)';
+    ind.style.border = '1px solid rgba(26,82,118,0.2)';
+    document.getElementById('f_rateIcon').textContent = '📋';
+    document.getElementById('f_rateTitle').style.color = '#1a5276';
+    document.getElementById('f_rateTitle').textContent = 'Weekday Rates Active (Mon–Thu)';
+    document.getElementById('f_rateSub').style.color = 'var(--grey)';
+    document.getElementById('f_rateSub').textContent = 'Standard weekday pricing applies for this period';
+  }
+
+  // Show current rate summary
+  document.getElementById('f_ratePrices').innerHTML = `
+    <div style="font-size:11px;text-align:center">
+      <div style="color:#1a5276;font-weight:700;margin-bottom:2px">WEEKDAY</div>
+      <div style="color:var(--grey);font-size:10px">Entry ${prices.wd.entry.toLocaleString()}</div>
+      <div style="color:var(--grey);font-size:10px">CL ${prices.wd.chair.toLocaleString()}</div>
+      <div style="color:var(--grey);font-size:10px">ZL ${prices.wd.zip.toLocaleString()}</div>
+    </div>
+    <div style="font-size:11px;text-align:center">
+      <div style="color:var(--gold);font-weight:700;margin-bottom:2px">WEEKEND</div>
+      <div style="color:var(--grey);font-size:10px">Entry ${prices.we.entry.toLocaleString()}</div>
+      <div style="color:var(--grey);font-size:10px">CL ${prices.we.chair.toLocaleString()}</div>
+      <div style="color:var(--grey);font-size:10px">ZL ${prices.we.zip.toLocaleString()}</div>
+    </div>`;
+
+  // Update revenue calculation using blended weekly rate (WE days in the week)
+  calcDailyTotals();
+}
+
+function getISOWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+function isWeekend(dateStr) {
+  if (!dateStr) return false;
+  const dow = new Date(dateStr).getDay();
+  return dow === 0 || dow === 5 || dow === 6; // Sun=0, Fri=5, Sat=6
+}
+
+function getPriceForDate(activity, dateStr) {
+  const rate = isWeekend(dateStr) ? prices.we : prices.wd;
+  return rate[activity] || 0;
+}
   document.getElementById('coList').innerHTML = coPersonnel.map((c,i)=>`
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
       <span>${c}</span>
