@@ -319,7 +319,82 @@
   .vbar-label { font-size:10px; color:var(--grey); font-family:'DM Mono',monospace; }
   .vbar-val { font-size:10px; color:var(--gold-light); font-family:'DM Mono',monospace; }
 
-  @media(max-width:900px) {
+  /* AUDIT VALIDATION */
+  .val-match   { color:#2ecc71; font-weight:600; font-size:11px; }
+  .val-mismatch{ color:#e74c3c; font-weight:600; font-size:11px; }
+  .val-input   { width:70px; padding:5px; font-size:12px; background:rgba(39,174,96,0.08); border-color:rgba(39,174,96,0.3); }
+  .val-input:focus { border-color:#2ecc71; background:rgba(39,174,96,0.12); }
+  .val-time-input { width:100px; padding:5px; font-size:12px; background:rgba(39,174,96,0.08); border-color:rgba(39,174,96,0.3); }
+  .resort-cell { color:var(--grey-light); font-size:12px; }
+  .disc-row { background:rgba(192,57,43,0.06); border:1px solid rgba(192,57,43,0.2); border-radius:8px; padding:14px; margin-bottom:10px; }
+
+  /* VALIDATION STATUS BADGES */
+  .vbadge-ok   { background:rgba(39,174,96,0.15);  color:#2ecc71; border:1px solid rgba(39,174,96,0.3);  padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .vbadge-warn { background:rgba(230,126,34,0.15); color:#f39c12; border:1px solid rgba(230,126,34,0.3); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .vbadge-disp { background:rgba(192,57,43,0.15);  color:#e74c3c; border:1px solid rgba(192,57,43,0.3);  padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+  .vbadge-pend { background:rgba(138,154,176,0.15);color:var(--grey); border:1px solid rgba(138,154,176,0.2); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+
+
+  .obs-status-badge {
+    display:inline-flex; align-items:center; gap:5px;
+    padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;
+    text-transform:uppercase; letter-spacing:0.05em; white-space:nowrap;
+  }
+  .obs-open    { background:rgba(192,57,43,0.15);  color:#e74c3c; border:1px solid rgba(192,57,43,0.3); }
+  .obs-actioned{ background:rgba(230,126,34,0.15); color:#f39c12; border:1px solid rgba(230,126,34,0.3); }
+  .obs-verified{ background:rgba(39,174,96,0.15);  color:#2ecc71; border:1px solid rgba(39,174,96,0.3); }
+  .obs-inprog  { background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); }
+  .obs-na      { background:rgba(138,154,176,0.15);color:var(--grey); border:1px solid rgba(138,154,176,0.2); }
+
+  .obs-pipeline { display:flex; gap:0; margin-bottom:28px; }
+  .obs-stage {
+    flex:1; padding:16px 20px; text-align:center;
+    background:var(--card); border:1px solid var(--border);
+    position:relative;
+  }
+  .obs-stage:first-child { border-radius:10px 0 0 10px; }
+  .obs-stage:last-child  { border-radius:0 10px 10px 0; }
+  .obs-stage::after {
+    content:'▶'; position:absolute; right:-10px; top:50%;
+    transform:translateY(-50%); color:var(--gold); font-size:12px; z-index:2;
+  }
+  .obs-stage:last-child::after { display:none; }
+  .obs-stage-num { font-family:'Syne',sans-serif; font-weight:800; font-size:28px; line-height:1; }
+  .obs-stage-label { font-size:10px; color:var(--grey); text-transform:uppercase; letter-spacing:0.06em; margin-top:4px; }
+  .obs-stage.red .obs-stage-num    { color:#e74c3c; }
+  .obs-stage.amber .obs-stage-num  { color:#f39c12; }
+  .obs-stage.blue .obs-stage-num   { color:#60a5fa; }
+  .obs-stage.green .obs-stage-num  { color:#2ecc71; }
+  .obs-stage.grey .obs-stage-num   { color:var(--grey); }
+
+  .obs-expand-row { cursor:pointer; }
+  .obs-expand-row:hover td { background:rgba(201,148,58,0.06) !important; }
+  .obs-detail-row td { padding:0 !important; }
+  .obs-detail-inner {
+    background:rgba(13,27,42,0.8); border-top:1px solid var(--border);
+    padding:16px 20px; font-size:12px; color:var(--grey-light);
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  }
+  .obs-detail-block label { display:block; font-size:10px; color:var(--grey); text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px; }
+  .obs-detail-block p { margin:0; line-height:1.6; }
+  .obs-detail-block.full { grid-column:1/-1; }
+
+  .obs-action-form {
+    background:rgba(22,32,53,0.95); border:1px solid var(--border);
+    border-radius:12px; padding:20px; margin-bottom:20px;
+  }
+  .obs-action-title { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--gold-light); margin-bottom:14px; }
+
+  /* DEPT FILTER CHIPS */
+  .chip-bar { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:16px; }
+  .chip {
+    padding:4px 12px; border-radius:20px; font-size:11px; font-weight:500;
+    border:1px solid var(--border); color:var(--grey); background:transparent;
+    cursor:pointer; transition:all 0.15s;
+  }
+  .chip:hover, .chip.active { border-color:var(--gold); color:var(--gold-light); background:rgba(201,148,58,0.1); }
+
+
     .grid-4,.grid-3 { grid-template-columns:repeat(2,1fr); }
     .form-grid { grid-template-columns:1fr; }
     .main { padding:16px; }
@@ -366,7 +441,9 @@
 <nav class="nav-tabs">
   <div class="nav-inner">
     <button class="nav-tab active" onclick="showPanel('dashboard',this)">📊 Dashboard</button>
-    <button class="nav-tab" onclick="showPanel('submit',this)">📝 Submit Report</button>
+    <button class="nav-tab" onclick="showPanel('submit',this)">📝 Resort Data Entry</button>
+    <button class="nav-tab" onclick="showPanel('validate',this)">✔ Audit Validation</button>
+    <button class="nav-tab" onclick="showPanel('observations',this)">🔍 Observations</button>
     <button class="nav-tab" onclick="showPanel('log',this)">📋 Submission Log</button>
     <button class="nav-tab" onclick="showPanel('reports',this)">📈 Weekly Reports</button>
     <button class="nav-tab" onclick="showPanel('config',this)">⚙️ Config</button>
@@ -390,10 +467,17 @@
     </div>
   </div>
 
-  <!-- SUBMIT REPORT -->
+  <!-- RESORT DATA ENTRY -->
   <div class="panel" id="panel-submit">
     <div class="card">
-      <div class="card-title"><div class="dot"></div>Weekly Audit Report Submission</div>
+      <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+        <span style="font-size:18px">🏔️</span>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#60a5fa;text-transform:uppercase;letter-spacing:.05em">Resort Team Data Entry</div>
+          <div style="font-size:12px;color:var(--grey);margin-top:2px">This form is completed by the Resort Operations Team. Once submitted, the Audit Team validates the data via the Audit Validation tab.</div>
+        </div>
+      </div>
+      <div class="card-title"><div class="dot"></div>Weekly Free &amp; Complimentary Ticket Report</div>
 
       <div class="form-grid">
         <div class="form-group">
@@ -457,6 +541,7 @@
           <thead>
             <tr>
               <th>Date</th>
+              <th>Arrival Time</th>
               <th>Entry Free</th><th>Entry Comp</th>
               <th>Chairlift Free</th><th>Chairlift Comp</th>
               <th>Zipline Free</th><th>Zipline Comp</th>
@@ -469,6 +554,7 @@
           <tfoot>
             <tr>
               <td>TOTAL</td>
+              <td></td>
               <td id="tot_ef">0</td><td id="tot_ec">0</td>
               <td id="tot_cf">0</td><td id="tot_cc">0</td>
               <td id="tot_zf">0</td><td id="tot_zc">0</td>
@@ -530,6 +616,188 @@
       <div style="display:flex;gap:12px;margin-top:24px;justify-content:flex-end">
         <button class="btn btn-outline" onclick="clearForm()">Clear Form</button>
         <button class="btn btn-gold" onclick="submitReport()">Submit Audit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIT VALIDATION -->
+  <div class="panel" id="panel-validate">
+
+    <div style="background:rgba(39,174,96,0.08);border:1px solid rgba(39,174,96,0.25);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">✔️</span>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:#2ecc71;text-transform:uppercase;letter-spacing:.05em">Audit Team Validation</div>
+        <div style="font-size:12px;color:var(--grey);margin-top:2px">Select a submitted weekly report, verify the figures against your on-site observations, and flag any discrepancies. Only the Audit team completes this tab.</div>
+      </div>
+    </div>
+
+    <!-- STEP 1: SELECT REPORT -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title"><div class="dot"></div>Step 1 — Select Report to Validate</div>
+      <div class="filter-bar">
+        <select id="val_weekSelect" onchange="loadReportForValidation()" style="max-width:300px">
+          <option value="">-- Select a submitted week --</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="loadValidationWeeks()">↻ Refresh List</button>
+      </div>
+      <div id="val_reportSummary"></div>
+    </div>
+
+    <!-- STEP 2: VALIDATE DAILY ENTRIES -->
+    <div class="card" id="val_dailyCard" style="margin-bottom:16px;display:none">
+      <div class="card-title"><div class="dot"></div>Step 2 — Validate Daily Entry Figures</div>
+      <div style="font-size:12px;color:var(--grey);margin-bottom:14px">Compare the resort team figures against your physical observation count. Enter your observed count in each Audit column. Flag any discrepancy.</div>
+      <div style="overflow-x:auto">
+        <table id="val_dailyTable">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Arrival Time (Resort)</th>
+              <th>Arrival Time (Audit)</th>
+              <th>Entry Free (Resort)</th><th>Entry Free (Audit)</th>
+              <th>Chairlift Free (Resort)</th><th>Chairlift Free (Audit)</th>
+              <th>Zipline Free (Resort)</th><th>Zipline Free (Audit)</th>
+              <th>GS Free (Resort)</th><th>GS Free (Audit)</th>
+              <th>Discrepancy?</th>
+            </tr>
+          </thead>
+          <tbody id="val_dailyRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STEP 3: VALIDATE C/O BREAKDOWN -->
+    <div class="card" id="val_coCard" style="margin-bottom:16px;display:none">
+      <div class="card-title"><div class="dot"></div>Step 3 — Validate C/O Authorisation Breakdown</div>
+      <div style="font-size:12px;color:var(--grey);margin-bottom:14px">Confirm the C/O who authorised each free/complimentary entry. Flag any unauthorised or incorrectly attributed entries.</div>
+      <div id="val_coRows"></div>
+    </div>
+
+    <!-- STEP 4: AUDIT FINDINGS -->
+    <div class="card" id="val_findingsCard" style="display:none">
+      <div class="card-title"><div class="dot"></div>Step 4 — Audit Findings &amp; Sign-Off</div>
+
+      <div class="form-grid" style="margin-bottom:16px">
+        <div class="form-group">
+          <label>Validated By (Auditor) *</label>
+          <select id="val_validatedBy">
+            <option value="">-- Select --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Validation Date</label>
+          <input type="date" id="val_date" readonly>
+        </div>
+        <div class="form-group">
+          <label>Overall Assessment</label>
+          <select id="val_assessment">
+            <option value="Validated — No Discrepancies">✅ Validated — No Discrepancies</option>
+            <option value="Validated — Minor Discrepancies">⚠ Validated — Minor Discrepancies</option>
+            <option value="Disputed — Significant Discrepancies">🚨 Disputed — Significant Discrepancies</option>
+            <option value="Pending Further Investigation">🔍 Pending Further Investigation</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Arrival Time Verified?</label>
+          <select id="val_arrivalVerified">
+            <option value="">-- Select --</option>
+            <option value="Yes — Matches CCTV">Yes — Matches CCTV</option>
+            <option value="Yes — Register confirmed">Yes — Register confirmed</option>
+            <option value="No — Time discrepancy noted">No — Time discrepancy noted</option>
+            <option value="Not checked">Not checked this week</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section-divider" style="margin-top:0">Discrepancy Details</div>
+      <div id="val_discRows"></div>
+      <button class="btn btn-outline btn-sm" style="margin-bottom:16px" onclick="addDiscRow()">+ Add Discrepancy</button>
+
+      <div class="section-divider">Audit Remarks</div>
+      <div class="form-group full" style="margin-bottom:20px">
+        <label>Overall Remarks / Notes for Management</label>
+        <textarea id="val_remarks" style="min-height:100px" placeholder="Summarise your findings, any patterns observed, or recommendations for management..."></textarea>
+      </div>
+
+      <!-- VALIDATION SUMMARY PREVIEW -->
+      <div id="val_summaryPreview" style="background:rgba(39,174,96,0.06);border:1px solid rgba(39,174,96,0.2);border-radius:10px;padding:16px;margin-bottom:20px;display:none">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:#2ecc71;margin-bottom:12px">Validation Summary Preview</div>
+        <div id="val_summaryContent" style="font-size:12px;color:var(--grey-light);line-height:1.8"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:flex-end">
+        <button class="btn btn-outline" onclick="previewValidation()">Preview</button>
+        <button class="btn btn-gold" onclick="submitValidation()">Submit Audit Validation</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- OBSERVATIONS -->
+  <div class="panel" id="panel-observations">
+
+    <!-- KPI PIPELINE -->
+    <div id="obsPipeline" class="obs-pipeline">
+      <div class="obs-stage red">  <div class="obs-stage-num" id="kpi_open">—</div><div class="obs-stage-label">Outstanding</div></div>
+      <div class="obs-stage blue"> <div class="obs-stage-num" id="kpi_prog">—</div><div class="obs-stage-label">In Progress</div></div>
+      <div class="obs-stage amber"><div class="obs-stage-num" id="kpi_act">—</div> <div class="obs-stage-label">Actioned by Resort</div></div>
+      <div class="obs-stage green"><div class="obs-stage-num" id="kpi_ver">—</div> <div class="obs-stage-label">Audit Verified</div></div>
+      <div class="obs-stage grey"> <div class="obs-stage-num" id="kpi_tot">—</div> <div class="obs-stage-label">Total Observations</div></div>
+    </div>
+
+    <!-- ADD NEW OBSERVATION -->
+    <div class="obs-action-form" id="newObsForm" style="display:none">
+      <div class="obs-action-title">+ New Audit Observation</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Audit Report Ref *</label><input type="text" id="no_ref" placeholder="e.g. Audit Report Mar-26"></div>
+        <div class="form-group"><label>Date of Observation *</label><input type="date" id="no_date"></div>
+        <div class="form-group"><label>Department *</label><input type="text" id="no_dept" placeholder="e.g. Civil Department" list="deptList">
+          <datalist id="deptList"></datalist></div>
+        <div class="form-group"><label>Raised By</label><select id="no_raisedBy"></select></div>
+        <div class="form-group full"><label>Observation / Task *</label><textarea id="no_task" placeholder="Describe the observation or issue in detail..." style="min-height:90px"></textarea></div>
+        <div class="form-group"><label>Deadline</label><input type="date" id="no_deadline"></div>
+        <div class="form-group"><label>Priority</label>
+          <select id="no_priority"><option value="High">High</option><option value="Medium" selected>Medium</option><option value="Low">Low</option></select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end">
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('newObsForm').style.display='none'">Cancel</button>
+        <button class="btn btn-gold btn-sm" onclick="submitObservation()">Save Observation</button>
+      </div>
+    </div>
+
+    <!-- FILTERS + ACTIONS -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">
+        <div class="card-title" style="margin-bottom:0"><div class="dot"></div>Audit Observations Tracker</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline btn-sm" onclick="loadObservations()">↻ Refresh</button>
+          <button class="btn btn-gold btn-sm" onclick="toggleNewObsForm()">+ Add Observation</button>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="obsSearch" placeholder="Search observations..." oninput="filterObs()" style="max-width:240px">
+        <select id="obsStatusFilter" onchange="filterObs()">
+          <option value="">All Statuses</option>
+          <option value="Open">Outstanding</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Actioned">Actioned — Pending Audit Verification</option>
+          <option value="Verified">Audit Verified Complete</option>
+          <option value="N/A">N/A</option>
+        </select>
+        <select id="obsDeptFilter" onchange="filterObs()">
+          <option value="">All Departments</option>
+        </select>
+        <select id="obsReportFilter" onchange="filterObs()">
+          <option value="">All Reports</option>
+        </select>
+      </div>
+
+      <div class="chip-bar" id="deptChips"></div>
+
+      <div id="obsContent">
+        <div class="loading"><div class="spinner"></div>Loading observations...</div>
       </div>
     </div>
   </div>
@@ -658,6 +926,8 @@ function verifyPin() {
     loadWeekOptions();
     loadLog();
     loadReports();
+    loadObservations();
+    loadValidationWeeks();
     renderConfig();
   } else {
     err.style.display = 'block';
@@ -925,6 +1195,7 @@ function addDailyRow() {
   const tr = document.createElement('tr'); tr.id = 'dr_'+id;
   tr.innerHTML = `
     <td><input type="date" class="dr-date" value="${dateStr}" style="padding:5px 8px;font-size:12px;width:130px" onchange="calcDailyTotals()"></td>
+    <td><input type="time" class="dr-arrtime" style="padding:5px 8px;font-size:12px;width:100px" title="Arrival time of first guest group — used for CCTV cross-reference if required"></td>
     <td><input type="number" class="dr-ef" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
     <td><input type="number" class="dr-ec" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
     <td><input type="number" class="dr-cf" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
@@ -1064,6 +1335,7 @@ async function submitReport() {
   document.querySelectorAll('#dailyRows tr').forEach(tr => {
     dailyData.push({
       date: tr.querySelector('.dr-date').value,
+      arrivalTime: tr.querySelector('.dr-arrtime').value,
       ef:+tr.querySelector('.dr-ef').value||0, ec:+tr.querySelector('.dr-ec').value||0,
       cf:+tr.querySelector('.dr-cf').value||0, cc:+tr.querySelector('.dr-cc').value||0,
       zf:+tr.querySelector('.dr-zf').value||0, zc:+tr.querySelector('.dr-zc').value||0,
@@ -1304,6 +1576,611 @@ function changePin() {
   if (nw !== conf) { toast('PINs do not match','error'); return; }
   toast('PIN updated — note: persisted via Config sheet after GAS connection');
   ['currentPin','newPin','confirmPin'].forEach(id=>document.getElementById(id).value='');
+}
+
+// ============================================================
+// AUDIT VALIDATION
+// ============================================================
+let currentValidationReport = null;
+
+async function loadValidationWeeks() {
+  const res = await gasCall({ action:'getLog', type:'auditReports' });
+  const sel = document.getElementById('val_weekSelect');
+  const data = (res.status==='demo' || !res.data) ? [
+    { id:'AR-001', weekNum:'WE 12', weekEnding:'2026-03-29', submittedBy:'Ahmed Qureshi' },
+    { id:'AR-002', weekNum:'WE 11', weekEnding:'2026-03-22', submittedBy:'SMIA 2' },
+  ] : res.data;
+
+  sel.innerHTML = '<option value="">-- Select a submitted week --</option>' +
+    data.map(r=>`<option value="${r.id}">[${r.weekNum}] ${r.weekEnding} — submitted by ${r.submittedBy}</option>`).join('');
+
+  // Also populate validator dropdown
+  document.getElementById('val_validatedBy').innerHTML =
+    '<option value="">-- Select --</option>' +
+    submitters.map(s=>`<option value="${s}">${s}</option>`).join('');
+  document.getElementById('val_date').value = new Date().toISOString().split('T')[0];
+}
+
+async function loadReportForValidation() {
+  const id = document.getElementById('val_weekSelect').value;
+  if (!id) return;
+
+  const res = await gasCall({ action:'getReportDetail', id });
+  const data = (res.status === 'demo' || !res.data) ? getDemoReportDetail(id) : res.data;
+  currentValidationReport = data;
+
+  // Show summary
+  document.getElementById('val_reportSummary').innerHTML = `
+    <div style="margin-top:12px;padding:14px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">
+      <div class="grid-4">
+        <div><div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em">Week</div><div style="font-weight:700;color:var(--white)">${data.weekNum}</div></div>
+        <div><div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em">Period Ending</div><div style="font-weight:700;color:var(--white)">${data.weekEnding}</div></div>
+        <div><div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em">Submitted By</div><div style="font-weight:700;color:var(--white)">${data.submittedBy}</div></div>
+        <div><div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em">Total Free Entrants</div><div style="font-weight:700;color:#e74c3c">${(data.totalFree||0).toLocaleString()}</div></div>
+      </div>
+    </div>`;
+
+  // Build daily validation table
+  buildDailyValidationTable(data.daily || []);
+
+  // Build C/O validation rows
+  buildCoValidationRows(data.coData || []);
+
+  // Show all cards
+  ['val_dailyCard','val_coCard','val_findingsCard'].forEach(id => {
+    document.getElementById(id).style.display = 'block';
+  });
+}
+
+function getDemoReportDetail(id) {
+  return {
+    id, weekNum:'WE 12', weekEnding:'2026-03-29',
+    submittedBy:'Ahmed Qureshi', totalFree:391,
+    daily:[
+      {date:'2026-03-23', arrivalTime:'09:15', ef:113, cf:33, zf:0, gf:0},
+      {date:'2026-03-24', arrivalTime:'09:43', ef:81,  cf:22, zf:1, gf:0},
+      {date:'2026-03-25', arrivalTime:'10:00', ef:58,  cf:4,  zf:0, gf:0},
+      {date:'2026-03-26', arrivalTime:'09:30', ef:24,  cf:6,  zf:0, gf:0},
+      {date:'2026-03-27', arrivalTime:'09:15', ef:55,  cf:24, zf:0, gf:0},
+      {date:'2026-03-28', arrivalTime:'10:15', ef:33,  cf:9,  zf:0, gf:0},
+      {date:'2026-03-29', arrivalTime:'09:00', ef:27,  cf:7,  zf:0, gf:0},
+    ],
+    coData:[
+      {name:'Without permission', ef:387, cf:0, zf:0, gf:0},
+      {name:'Major Iqbal',        ef:0, cf:47, zf:1, gf:0},
+      {name:'Martin Schultz',     ef:0, cf:0,  zf:0, gf:5},
+      {name:'Shehzad Alam',       ef:4, cf:0,  zf:0, gf:0},
+    ]
+  };
+}
+
+function buildDailyValidationTable(daily) {
+  const tbody = document.getElementById('val_dailyRows');
+  tbody.innerHTML = daily.map((r,i) => `
+    <tr>
+      <td class="bold">${r.date}</td>
+      <td class="resort-cell">${r.arrivalTime||'—'}</td>
+      <td><input type="time" class="val-time-input" id="vat_arr_${i}" style="padding:5px 8px;font-size:12px;border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:rgba(39,174,96,0.06);color:var(--white)" title="Enter the arrival time you recorded on site"></td>
+      <td class="resort-cell">${r.ef||0}</td>
+      <td><input type="number" class="val-input" id="vef_${i}" value="" min="0" style="border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:rgba(39,174,96,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
+      <td class="resort-cell">${r.cf||0}</td>
+      <td><input type="number" class="val-input" id="vcf_${i}" value="" min="0" style="border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:rgba(39,174,96,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
+      <td class="resort-cell">${r.zf||0}</td>
+      <td><input type="number" class="val-input" id="vzf_${i}" value="" min="0" style="border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:rgba(39,174,96,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
+      <td class="resort-cell">${r.gf||0}</td>
+      <td><input type="number" class="val-input" id="vgf_${i}" value="" min="0" style="border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:rgba(39,174,96,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
+      <td id="vdisc_${i}" style="font-size:11px;font-weight:600;color:var(--grey)">—</td>
+    </tr>`).join('');
+}
+
+function checkDailyDisc(i, ref_ef, ref_cf, ref_zf, ref_gf) {
+  const aef = document.getElementById('vef_'+i)?.value;
+  const acf = document.getElementById('vcf_'+i)?.value;
+  const azf = document.getElementById('vzf_'+i)?.value;
+  const agf = document.getElementById('vgf_'+i)?.value;
+  const discEl = document.getElementById('vdisc_'+i);
+  if (!discEl) return;
+
+  // Only evaluate filled fields
+  const filled = [aef,acf,azf,agf].filter(v=>v!=='');
+  if (!filled.length) { discEl.textContent='—'; discEl.style.color='var(--grey)'; return; }
+
+  const mismatches = [];
+  if (aef!=='' && +aef!==ref_ef) mismatches.push(`Entry: resort ${ref_ef} vs audit ${aef}`);
+  if (acf!=='' && +acf!==ref_cf) mismatches.push(`Chairlift: resort ${ref_cf} vs audit ${acf}`);
+  if (azf!=='' && +azf!==ref_zf) mismatches.push(`Zipline: resort ${ref_zf} vs audit ${azf}`);
+  if (agf!=='' && +agf!==ref_gf) mismatches.push(`GS: resort ${ref_gf} vs audit ${agf}`);
+
+  if (mismatches.length) {
+    discEl.innerHTML = `<span class="val-mismatch">⚠ ${mismatches.length} diff${mismatches.length>1?'s':''}</span>`;
+    discEl.title = mismatches.join(' | ');
+  } else {
+    discEl.innerHTML = `<span class="val-match">✓ Match</span>`;
+  }
+}
+
+function buildCoValidationRows(coData) {
+  document.getElementById('val_coRows').innerHTML = coData.map((r,i)=>`
+    <div style="display:flex;align-items:center;gap:16px;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;margin-bottom:8px;flex-wrap:wrap">
+      <div style="font-weight:600;font-size:13px;min-width:200px">${r.name}</div>
+      <div style="font-size:12px;color:var(--grey)">Entry: <span style="color:var(--white)">${r.ef||0}</span></div>
+      <div style="font-size:12px;color:var(--grey)">Chairlift: <span style="color:var(--white)">${r.cf||0}</span></div>
+      <div style="font-size:12px;color:var(--grey)">Zipline: <span style="color:var(--white)">${r.zf||0}</span></div>
+      <div style="font-size:12px;color:var(--grey)">Giant Swing: <span style="color:var(--white)">${r.gf||0}</span></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+        <label style="font-size:11px;color:var(--grey)">Audit confirms?</label>
+        <select id="vco_${i}" style="padding:5px 10px;font-size:12px;background:rgba(39,174,96,0.06);border:1px solid rgba(39,174,96,0.3);border-radius:6px;color:var(--white)">
+          <option value="">-- Confirm --</option>
+          <option value="Confirmed">✅ Confirmed</option>
+          <option value="Discrepancy — count differs">⚠ Count differs</option>
+          <option value="Discrepancy — wrong C/O">⚠ Wrong C/O attributed</option>
+          <option value="Unauthorised — no approval on record">🚨 Unauthorised</option>
+        </select>
+      </div>
+    </div>`).join('');
+}
+
+function addDiscRow() {
+  const id = Date.now();
+  const div = document.createElement('div');
+  div.className = 'disc-row'; div.id = 'disc_'+id;
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:600;color:#e74c3c">Discrepancy / Flag</div>
+      <button class="remove-btn" onclick="this.closest('.disc-row').remove()">Remove</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label>Date</label><input type="date" class="disc-date"></div>
+      <div class="form-group"><label>Activity</label>
+        <select class="disc-activity"><option>Entry</option><option>Chairlift</option><option>Zipline</option><option>Giant Swing</option><option>Slingshot</option><option>C/O Attribution</option><option>Arrival Time</option><option>Other</option></select>
+      </div>
+      <div class="form-group"><label>Resort Figure</label><input type="text" class="disc-resort" placeholder="e.g. 33"></div>
+      <div class="form-group"><label>Audit Observed</label><input type="text" class="disc-audit" placeholder="e.g. 28"></div>
+      <div class="form-group full"><label>Remarks / Explanation</label><input type="text" class="disc-remarks" placeholder="Describe the discrepancy and any supporting evidence (e.g. CCTV time, register entry)"></div>
+    </div>`;
+  document.getElementById('val_discRows').appendChild(div);
+}
+
+function previewValidation() {
+  const by = document.getElementById('val_validatedBy').value;
+  const assessment = document.getElementById('val_assessment').value;
+  const remarks = document.getElementById('val_remarks').value;
+  const arrVerified = document.getElementById('val_arrivalVerified').value;
+
+  const discs = [...document.querySelectorAll('.disc-row')].map(r=>({
+    date: r.querySelector('.disc-date').value,
+    activity: r.querySelector('.disc-activity').value,
+    resort: r.querySelector('.disc-resort').value,
+    audit: r.querySelector('.disc-audit').value,
+    remarks: r.querySelector('.disc-remarks').value,
+  }));
+
+  const badgeMap = {
+    'Validated — No Discrepancies':'vbadge-ok',
+    'Validated — Minor Discrepancies':'vbadge-warn',
+    'Disputed — Significant Discrepancies':'vbadge-disp',
+    'Pending Further Investigation':'vbadge-pend',
+  };
+
+  let html = `
+    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:12px">
+      <div><span style="font-size:10px;color:var(--grey)">VALIDATOR</span><br><strong>${by||'—'}</strong></div>
+      <div><span style="font-size:10px;color:var(--grey)">ASSESSMENT</span><br><span class="${badgeMap[assessment]||'vbadge-pend'}">${assessment}</span></div>
+      <div><span style="font-size:10px;color:var(--grey)">ARRIVAL TIME</span><br><span style="font-size:12px">${arrVerified||'—'}</span></div>
+      <div><span style="font-size:10px;color:var(--grey)">DISCREPANCIES FLAGGED</span><br><strong style="color:${discs.length?'#e74c3c':'#2ecc71'}">${discs.length}</strong></div>
+    </div>`;
+
+  if (discs.length) {
+    html += `<div style="font-size:11px;color:var(--grey);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Flagged Items:</div>`;
+    discs.forEach((d,i)=>{ html += `<div style="font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">${i+1}. <strong>${d.date} — ${d.activity}</strong> | Resort: ${d.resort||'—'} vs Audit: ${d.audit||'—'} | ${d.remarks||'—'}</div>`; });
+  }
+
+  if (remarks) html += `<div style="margin-top:10px;font-size:12px;color:var(--grey-light);font-style:italic">"${remarks}"</div>`;
+
+  document.getElementById('val_summaryContent').innerHTML = html;
+  document.getElementById('val_summaryPreview').style.display = 'block';
+}
+
+async function submitValidation() {
+  const by = document.getElementById('val_validatedBy').value;
+  if (!by) { toast('Please select the validating auditor','error'); return; }
+  if (!currentValidationReport) { toast('Please select a report to validate','error'); return; }
+
+  const assessment = document.getElementById('val_assessment').value;
+  const remarks    = document.getElementById('val_remarks').value;
+  const arrVerified= document.getElementById('val_arrivalVerified').value;
+
+  // Collect daily audit figures
+  const dailyAudit = (currentValidationReport.daily||[]).map((r,i)=>({
+    date: r.date,
+    resortArrival: r.arrivalTime,
+    auditArrival:  document.getElementById('vat_arr_'+i)?.value||'',
+    resortEf: r.ef, auditEf: +document.getElementById('vef_'+i)?.value||null,
+    resortCf: r.cf, auditCf: +document.getElementById('vcf_'+i)?.value||null,
+    resortZf: r.zf, auditZf: +document.getElementById('vzf_'+i)?.value||null,
+    resortGf: r.gf, auditGf: +document.getElementById('vgf_'+i)?.value||null,
+  }));
+
+  // Collect C/O confirmations
+  const coAudit = (currentValidationReport.coData||[]).map((r,i)=>({
+    name: r.name,
+    auditConfirmation: document.getElementById('vco_'+i)?.value||'Confirmed'
+  }));
+
+  // Collect discrepancy flags
+  const discrepancies = [...document.querySelectorAll('.disc-row')].map(r=>({
+    date:     r.querySelector('.disc-date').value,
+    activity: r.querySelector('.disc-activity').value,
+    resort:   r.querySelector('.disc-resort').value,
+    audit:    r.querySelector('.disc-audit').value,
+    remarks:  r.querySelector('.disc-remarks').value,
+  }));
+
+  const payload = {
+    action: 'submitValidation',
+    reportId: currentValidationReport.id,
+    weekNum: currentValidationReport.weekNum,
+    weekEnding: currentValidationReport.weekEnding,
+    validatedBy: by,
+    validationDate: document.getElementById('val_date').value,
+    assessment, arrivalTimeVerified: arrVerified,
+    remarks, dailyAudit, coAudit, discrepancies,
+    timestamp: new Date().toISOString()
+  };
+
+  const result = await gasCall(payload);
+  if (result.status === 'demo') {
+    toast('Demo mode: Validation captured (GAS not connected)','info');
+  } else if (result.status === 'success') {
+    toast(`Audit validation submitted — ${assessment}`,'success');
+  } else {
+    toast('Error: '+(result.message||'Unknown'),'error');
+  }
+}
+
+// ============================================================
+// OBSERVATIONS
+// ============================================================
+let allObs = [];
+let filteredObs = [];
+let obsPage = 1;
+const OBS_PAGE = 25;
+
+// Seed data from the uploaded Excel file (217 real observations)
+const SEED_OBS = [
+  {sn:1,  ref:'Audit report Mar-26',   dept:'Civil Department',          task:'Some washrooms at the top station are non-operational due to sewerage and door lock issues', date:'2026-03-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'High'},
+  {sn:2,  ref:'Audit report Mar-26',   dept:'Admin Department',           task:'Most of the dustbins at top station observed with broken covers', date:'2026-03-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'Medium'},
+  {sn:3,  ref:'Audit report Mar-26',   dept:'Civil Department',           task:'At top station, several black chairs are damaged and causing guests\' clothes to tear', date:'2026-03-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'Medium'},
+  {sn:4,  ref:'Audit report Mar-26',   dept:'Chairlift Office',           task:'At the top station, there is no ticket checker and customers swipe their cards themselves', date:'2026-03-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'High'},
+  {sn:5,  ref:'Audit report Mar-26',   dept:'Sales Department',           task:'Zipline tapper is currently non-operational. Multiple repair attempts have failed to resolve the issue', date:'2026-03-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'High'},
+  {sn:6,  ref:'Audit report Mar-26',   dept:'Civil Department',           task:'At zipline station, scrap items (hand trolley, fire pit, steel chairs) are kept at the back of rooms exposed to sunlight — require organised designated storage', date:'2026-03-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'Low'},
+  {sn:7,  ref:'Audit report Mar-26',   dept:'Civil Department',           task:'The Malam Jabba photo frame frequently used by guests for pictures is damaged and needs repair', date:'2026-03-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'Medium'},
+  {sn:8,  ref:'Audit report Mar-26',   dept:'Sales Department',           task:'Three VR gaming activities for children are non-operational due to required repairs, resulting in revenue loss', date:'2026-03-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'High'},
+  {sn:9,  ref:'Audit report Mar-26',   dept:'Chairlift Office',           task:'One camera needs to be installed in ski shop near cash counter to monitor sales activities', date:'2026-03-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'Medium'},
+  {sn:10, ref:'Audit report Jan-26',   dept:'Sales Department',           task:'Online platforms show food vouchers included in activity prices (Tubby, Jumping Castle, Horse Riding, Leap of Faith, Trampoline, Chairlift top, Zipline top) which is inconsistent with approved rates', date:'2026-01-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'High'},
+  {sn:11, ref:'Audit report Jan-26',   dept:'Sales Department',           task:'On 29th January, routine stock count at Lazeez Restaurant found half chicken short', date:'2026-01-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'Medium'},
+  {sn:12, ref:'Audit report Jan-26',   dept:'F&B',                        task:'Integrado malfunction caused POS printer at Ski Shop to reprint 40 tickets on 30 Jan with no corresponding revenue recorded against reprints', date:'2026-01-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'High'},
+  {sn:13, ref:'Audit report Dec-25',   dept:'Sales Department',           task:'No CCTV cameras installed in ski shop during peak skiing season — significant control gap. CCTV recommended with one camera at cash counter', date:'2025-12-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'High'},
+  {sn:14, ref:'Audit report Dec-25',   dept:'Chairlift Store',            task:'Stock count discrepancies: Oil rubber small seal grip 1 extra, Grease Nipple 5 short, Nose grip plier 1 damaged', date:'2025-12-01', resortStatus:'', deadline:'', resortComment:'', auditVerified:'', auditComment:'', priority:'Medium'},
+  {sn:15, ref:'Audit report Nov-25',   dept:'Sales Department',           task:'CSR team punched chairlift card incorrectly generating two tickets and two food vouchers. Issue must be discussed with Integrado team for permanent fix', date:'2025-11-01', resortStatus:'Yes', deadline:'', resortComment:'Issue resolved by updating in Integrado system', auditVerified:'Yes', auditComment:'', priority:'High'},
+  {sn:16, ref:'Audit report Nov-25',   dept:'Sales Department',           task:'03 complimentary chairlift tickets issued against 31 paid tickets on 09 Nov but only 25 visitors counted at entry. Sales team revised to 23 paid / 02 comp after inquiry', date:'2025-11-01', resortStatus:'Yes', deadline:'', resortComment:'Resolved. Verbal warning issued to sales supervisor to follow correct SOP', auditVerified:'Yes', auditComment:'', priority:'High'},
+  {sn:17, ref:'Audit report Nov-25',   dept:'Sales Department',           task:'No Sales team member deputed at top station for Chairlift and Zipline tickets — customers requesting tickets from security or Chairlift staff (risk of revenue loss or misuse)', date:'2025-11-01', resortStatus:'Yes', deadline:'', resortComment:'Asmat Sales staff deputed permanently at top station until skiing season starts', auditVerified:'Yes', auditComment:'', priority:'High'},
+  {sn:18, ref:'Audit report Nov-25',   dept:'Lazeez Restaurant',          task:'Rats seen in tandoor room near flour pots and restaurant kitchen. Corrective action taken but rats continue to be seen — permanent resolution required', date:'2025-11-01', resortStatus:'In Progress', deadline:'', resortComment:'Order placed to cover ventilation with mesh and rat catchers placed in different locations', auditVerified:'Yes', auditComment:'Resolved', priority:'High'},
+  {sn:19, ref:'Audit report Nov-25',   dept:'Lazeez Restaurant',          task:'Chicken procured from Mingora at Rs.620/piece (Rs.775/kg) vs Rs.350/kg available at Konjo Bazar — significant price difference requires investigation and multiple supplier quotations', date:'2025-11-01', resortStatus:'Yes', deadline:'', resortComment:'All chicken now procured from Mingora with cross-checked quality/prices. Local purchase stopped', auditVerified:'Yes', auditComment:'', priority:'Medium'},
+  {sn:20, ref:'Audit report Nov-25',   dept:'Lazeez Restaurant',          task:'Multiple customers reported insufficient chicken servings (Karahi) and undercooked chicken in Biryani', date:'2025-11-01', resortStatus:'Yes', deadline:'', resortComment:'Chicken serving being given proper portions now', auditVerified:'Yes', auditComment:'', priority:'Medium'},
+  {sn:21, ref:'Audit report Nov-25',   dept:'Sales Department',           task:'Zipline cards not being scanned at main gate, entry point, or Zipline station due to different weekend/weekday rates — risk of misuse and unauthorised access', date:'2025-11-01', resortStatus:'In Progress', deadline:'2026-02-01', resortComment:'Technical team is working on it', auditVerified:'Yes', auditComment:'Resolved', priority:'High'},
+  {sn:22, ref:'Audit report Oct-25',   dept:'General Issues',             task:'Three holes observed on pedestal area of wall climbing section where children land — potential hazard for children and staff. Requires prompt repair', date:'2025-10-01', resortStatus:'Yes', deadline:'', resortComment:'Platform changed', auditVerified:'Yes', auditComment:'', priority:'High'},
+  {sn:23, ref:'Audit report Oct-25',   dept:'Green Valley',               task:'Coffee machine in Green Valley area is out of order — repair or replacement essential to restore service and prevent revenue loss', date:'2025-10-01', resortStatus:'Yes', deadline:'', resortComment:'', auditVerified:'Yes', auditComment:'', priority:'Medium'},
+  {sn:24, ref:'Audit report Oct-25',   dept:'Green Valley',               task:'CCTV screen in Green Valley security staff room has been out of order for several days — uninterrupted surveillance required especially at night', date:'2025-10-01', resortStatus:'Yes', deadline:'', resortComment:'', auditVerified:'Yes', auditComment:'', priority:'High'},
+  {sn:25, ref:'Audit report Oct-25',   dept:'Chairlift & Zipline E-Gates', task:'Chairlift E-gate at top station out of service for several days with no ticket checker deputed — risk of unauthorised use through old tickets', date:'2025-10-01', resortStatus:'Yes', deadline:'', resortComment:'E-gate fixed, security staff deputed for ticket checking', auditVerified:'Yes', auditComment:'', priority:'High'},
+  {sn:26, ref:'Audit report Oct-25',   dept:'Chairlift & Zipline E-Gates', task:'Zipline tapper out of service. E-gate design impractical — counterpart creating obstruction between moving rods and static pillar found missing', date:'2025-10-01', resortStatus:'In Progress', deadline:'2026-01-02', resortComment:'', auditVerified:'Yes', auditComment:'', priority:'High'},
+  {sn:37, ref:'Email 23 Sept 25',      dept:'Green Valley',               task:'Jumping castle at Green Valley becomes non-operational during load shedding — no power backup available. Backup system recommended for peak hours', date:'2025-08-01', resortStatus:'', deadline:'', resortComment:'Generator cannot be used only for jumping castle as misuse of resources', auditVerified:'', auditComment:'Recommendation was for peak time only — agree with reasoning for off-peak', priority:'Medium'},
+  {sn:38, ref:'Email 23 Sept 25',      dept:'Green Valley',               task:'Main motor of Dragon Ship at Green Valley misplaced or stolen. New motor purchased but proper investigation required to identify those responsible', date:'2025-08-01', resortStatus:'', deadline:'', resortComment:'Bilal is working on it in different stores', auditVerified:'', auditComment:'As per discussion with Mr. Bilal Tariq, motor is misplaced and not yet found', priority:'High'},
+  {sn:41, ref:'Email 23 Sept 25',      dept:'Long Outstanding Credit Sales', task:'Sales transactions recorded only on receipt of cash, not at time of sale — accumulated outstanding balance of Rs.4,061,590 from 2018 to 2024', date:'2025-08-01', resortStatus:'', deadline:'', resortComment:'New policy created. All sales made on day of purchase. Old credits still exist for management review', auditVerified:'Yes', auditComment:'', priority:'High'},
+  {sn:42, ref:'Email 23 Sept 25',      dept:'Long Outstanding Credit Sales', task:'Outstanding balance includes Rs.1,410 recoverable from Mr. Hassan Malik (CSR) who has left employment — amounts remain unsettled', date:'2025-08-01', resortStatus:'', deadline:'', resortComment:'Sales team following up to recover balance', auditVerified:'', auditComment:'Not yet recovered', priority:'High'},
+  {sn:43, ref:'Email 23 Sept 25',      dept:'Long Outstanding Credit Sales', task:'Unrecorded credit sales for August Rs.39,335 — most bills for senior management, continuous follow-up in progress', date:'2025-08-01', resortStatus:'', deadline:'', resortComment:'Most bills for senior management. Continuous follow-up in progress', auditVerified:'', auditComment:'Noted', priority:'High'},
+  {sn:55, ref:'Email 22 Aug 2025',     dept:'Electrical Department',      task:'No backup or alternative power source available for POS and e-gates', date:'2025-07-01', resortStatus:'', deadline:'', resortComment:'UPS system quotation collected, in progress', auditVerified:'', auditComment:'Still pending', priority:'High'},
+  {sn:71, ref:'Audit Report Jan-25',   dept:'General Observation',        task:'Bin card system not implemented to track complete inventory records', date:'2025-01-07', resortStatus:'No', deadline:'', resortComment:'Bilal is discussing with Qureshi Sb, will be implemented soon', auditVerified:'', auditComment:'Bin cards implemented in chairlift store, in progress for electrical and civil stores. Not yet in food store', priority:'Medium'},
+  {sn:73, ref:'Audit Report Jan-25',   dept:'General Observation',        task:'Different brands for single products across stores — lack of standardisation', date:'2025-01-07', resortStatus:'No', deadline:'', resortComment:'SOP implemented for electric store and procurement to send items from well-known brands', auditVerified:'', auditComment:'Once current stock consumed, new items will be purchased of same brand', priority:'Low'},
+  {sn:74, ref:'Audit Report Jan-25',   dept:'General Observation',        task:'Diesel drums being stored in the generator room — requires new designated exterior diesel storage', date:'2025-01-07', resortStatus:'No', deadline:'', resortComment:'Working on solution to build new diesel storage exterior the generator building', auditVerified:'', auditComment:'Work in progress per Mr. Bilal Tariq, to be completed very soon', priority:'High'},
+  {sn:75, ref:'Audit Report Jan-25',   dept:'PC Civil Store',             task:'Mr. Nadeem Raza has not yet provided PC civil store inventory sheets for inventory count', date:'2025-01-07', resortStatus:'No', deadline:'', resortComment:'Nadeem Raza will share inventory in 2-3 days', auditVerified:'', auditComment:'Pending', priority:'Medium'},
+  {sn:129, ref:'Audit Report Jan-24',  dept:'Dispensary',                 task:'Dispensary is not registered with the Health Regulatory Authority', date:'2024-01-30', resortStatus:'No', deadline:'', resortComment:'', auditVerified:'No', auditComment:'', priority:'High'},
+  {sn:134, ref:'Audit Report Jan-24',  dept:'Generator Room',             task:'Diesel drums stored in the generator room — exterior diesel tank required', date:'2024-01-30', resortStatus:'No', deadline:'', resortComment:'Working on solution to build new diesel storage exterior', auditVerified:'', auditComment:'Diesel tank work in progress per Mr. Bilal Tariq', priority:'High'},
+  {sn:156, ref:'Audit Report May-23',  dept:'Top Station',                task:'Tree huts not adequately repaired — Forest department blocking repairs as no permission for installation. Further permissions being sought', date:'2023-05-02', resortStatus:'No', deadline:'N/a', resortComment:'Tree huts not able to get repaired since Forest is blocking. Permission being sought', auditVerified:'', auditComment:'Noted', priority:'Low'},
+  {sn:169, ref:'Audit Report May-23',  dept:'Top Station Restaurant',     task:'No energy drinks at top restaurant', date:'2023-05-02', resortStatus:'No', deadline:'', resortComment:'', auditVerified:'No', auditComment:'', priority:'Low'},
+  {sn:178, ref:'Audit Report May-23',  dept:'Dispensary',                 task:'Medical store not registered with the Health Regulatory Authority', date:'2023-05-02', resortStatus:'No', deadline:'', resortComment:'In discussion with CEO — requires registration fees, running costs, hiring of new doctors', auditVerified:'', auditComment:'Noted', priority:'High'},
+  {sn:188, ref:'Audit Report May-23',  dept:'Generator Room',             task:'Diesel drums stored in generator room', date:'2023-05-02', resortStatus:'No', deadline:'', resortComment:'Working on new exterior diesel storage solution', auditVerified:'', auditComment:'Work in progress per Mr. Bilal Tariq', priority:'High'},
+  {sn:213, ref:'Audit Report May-23',  dept:'Ski Shop',                   task:'Rainwater dripping behind ski shop storeroom — likely ground seepage. Large civil task required', date:'2023-05-02', resortStatus:'No', deadline:'', resortComment:'Area no longer used as storage, not urgent at this stage', auditVerified:'', auditComment:'No longer a storage area, no need to repair', priority:'Low'},
+];
+
+function obsStatusCode(r) {
+  const rs = String(r.resortStatus||'').toLowerCase().trim();
+  const av = String(r.auditVerified||'').toLowerCase().trim();
+  if (av === 'yes' || av === 'resolved') return 'Verified';
+  if (rs === 'yes') return 'Actioned';
+  if (rs === 'in progress') return 'In Progress';
+  if (rs === 'no' || rs === '') return 'Open';
+  return 'Open';
+}
+
+function obsStatusBadge(code) {
+  const map = {
+    'Open':     ['obs-open',    '⚠ Outstanding'],
+    'In Progress':['obs-inprog','↻ In Progress'],
+    'Actioned': ['obs-actioned','✔ Actioned'],
+    'Verified': ['obs-verified','✅ Verified'],
+    'N/A':      ['obs-na',      '— N/A'],
+  };
+  const [cls, label] = map[code] || ['obs-na','—'];
+  return `<span class="obs-status-badge ${cls}">${label}</span>`;
+}
+
+function priorityBadge(p) {
+  const map = { High:'badge-red', Medium:'badge-amber', Low:'badge-gold' };
+  return `<span class="stat-badge ${map[p]||'badge-gold'}">${p||'—'}</span>`;
+}
+
+async function loadObservations() {
+  document.getElementById('obsContent').innerHTML = '<div class="loading"><div class="spinner"></div>Loading observations...</div>';
+  const res = await gasCall({ action:'getObservations' });
+  if (res.status === 'success' && res.data && res.data.length > 0) {
+    allObs = res.data;
+  } else {
+    allObs = SEED_OBS.map(r => ({ ...r, status: obsStatusCode(r) }));
+  }
+  buildObsFilters();
+  filterObs();
+  updateObsKPIs();
+}
+
+function buildObsFilters() {
+  // Dept dropdown
+  const depts = [...new Set(allObs.map(r=>r.dept).filter(Boolean))].sort();
+  const dsel = document.getElementById('obsDeptFilter');
+  dsel.innerHTML = '<option value="">All Departments</option>' + depts.map(d=>`<option value="${d}">${d}</option>`).join('');
+
+  // Report ref dropdown
+  const refs = [...new Set(allObs.map(r=>r.ref).filter(Boolean))].sort((a,b)=>b.localeCompare(a));
+  const rsel = document.getElementById('obsReportFilter');
+  rsel.innerHTML = '<option value="">All Reports</option>' + refs.map(r=>`<option value="${r}">${r}</option>`).join('');
+
+  // Dept chips (top 8)
+  const topDepts = depts.slice(0,10);
+  document.getElementById('deptChips').innerHTML =
+    '<button class="chip active" onclick="setDeptChip(this,\'\')">All</button>' +
+    topDepts.map(d=>`<button class="chip" onclick="setDeptChip(this,'${d.replace(/'/g,"\\'")}' )">${d}</button>`).join('');
+
+  // Datalist for new obs form
+  document.getElementById('deptList').innerHTML = depts.map(d=>`<option value="${d}">`).join('');
+
+  // Raised By dropdown
+  const rbSel = document.getElementById('no_raisedBy');
+  rbSel.innerHTML = '<option value="">-- Audit Staff --</option>' + submitters.map(s=>`<option value="${s}">${s}</option>`).join('');
+}
+
+function setDeptChip(el, dept) {
+  document.querySelectorAll('#deptChips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('obsDeptFilter').value = dept;
+  filterObs();
+}
+
+function filterObs() {
+  const search = document.getElementById('obsSearch').value.toLowerCase();
+  const status = document.getElementById('obsStatusFilter').value;
+  const dept   = document.getElementById('obsDeptFilter').value;
+  const ref    = document.getElementById('obsReportFilter').value;
+
+  filteredObs = allObs.filter(r => {
+    const code = obsStatusCode(r);
+    const txt  = (r.task+' '+r.dept+' '+r.ref+' '+(r.resortComment||'')+' '+(r.auditComment||'')).toLowerCase();
+    return (!search || txt.includes(search)) &&
+           (!status || code === status) &&
+           (!dept   || r.dept === dept) &&
+           (!ref    || r.ref === ref);
+  });
+  obsPage = 1;
+  renderObs();
+  updateObsKPIs();
+}
+
+function updateObsKPIs() {
+  const total  = allObs.length;
+  const open   = allObs.filter(r=>obsStatusCode(r)==='Open').length;
+  const prog   = allObs.filter(r=>obsStatusCode(r)==='In Progress').length;
+  const act    = allObs.filter(r=>obsStatusCode(r)==='Actioned').length;
+  const ver    = allObs.filter(r=>obsStatusCode(r)==='Verified').length;
+  document.getElementById('kpi_open').textContent = open;
+  document.getElementById('kpi_prog').textContent = prog;
+  document.getElementById('kpi_act').textContent  = act;
+  document.getElementById('kpi_ver').textContent  = ver;
+  document.getElementById('kpi_tot').textContent  = total;
+}
+
+function renderObs() {
+  const start = (obsPage-1)*OBS_PAGE;
+  const page  = filteredObs.slice(start, start+OBS_PAGE);
+  const total = filteredObs.length;
+  const pages = Math.ceil(total/OBS_PAGE);
+
+  if (!page.length) {
+    document.getElementById('obsContent').innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><p>No observations match the current filters</p></div>';
+    return;
+  }
+
+  let rows = page.map((r,i) => {
+    const code  = obsStatusCode(r);
+    const idx   = start+i;
+    const taskShort = r.task.length > 100 ? r.task.substring(0,100)+'…' : r.task;
+    return `
+      <tr class="obs-expand-row" onclick="toggleObsDetail(${idx})">
+        <td class="bold" style="font-family:'DM Mono',monospace;font-size:11px">${r.sn}</td>
+        <td style="font-size:11px;color:var(--grey);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.ref}</td>
+        <td style="max-width:130px;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.dept}</td>
+        <td style="max-width:320px;font-size:12px">${taskShort}</td>
+        <td style="font-size:11px;color:var(--grey)">${r.date||'—'}</td>
+        <td>${priorityBadge(r.priority)}</td>
+        <td>${obsStatusBadge(code)}</td>
+        <td>${r.auditVerified ? obsStatusBadge('Verified') : '<span style="color:var(--grey);font-size:11px">Pending</span>'}</td>
+        <td>
+          <button class="btn btn-outline btn-sm" style="font-size:10px;padding:4px 10px" onclick="event.stopPropagation();openUpdateModal(${idx})">Update</button>
+        </td>
+      </tr>
+      <tr class="obs-detail-row" id="obsDetail_${idx}" style="display:none">
+        <td colspan="9">
+          <div class="obs-detail-inner">
+            <div class="obs-detail-block full"><label>Full Observation</label><p>${r.task}</p></div>
+            <div class="obs-detail-block"><label>Resort Team Response</label><p>${r.resortComment||'<em style="opacity:.5">No response yet</em>'}</p></div>
+            <div class="obs-detail-block"><label>Audit Comment</label><p>${r.auditComment||'<em style="opacity:.5">No comment yet</em>'}</p></div>
+            <div class="obs-detail-block"><label>Deadline</label><p>${r.deadline||'—'}</p></div>
+            <div class="obs-detail-block"><label>Resort Actioned?</label><p>${r.resortStatus||'—'}</p></div>
+          </div>
+        </td>
+      </tr>`;
+  }).join('');
+
+  let html = `<div class="table-wrap"><table>
+    <thead><tr>
+      <th>S/N</th><th>Report</th><th>Department</th><th>Observation</th>
+      <th>Date</th><th>Priority</th><th>Resort Status</th><th>Audit Verified</th><th></th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+
+  if (pages > 1) {
+    html += `<div class="pagination">
+      <span class="page-info">${start+1}-${Math.min(start+OBS_PAGE,total)} of ${total}</span>`;
+    for (let i=1;i<=pages;i++) html += `<button class="page-btn ${i===obsPage?'active':''}" onclick="obsPage=${i};renderObs()">${i}</button>`;
+    html += '</div>';
+  }
+  document.getElementById('obsContent').innerHTML = html;
+}
+
+function toggleObsDetail(idx) {
+  const row = document.getElementById('obsDetail_'+idx);
+  if (!row) return;
+  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+
+// UPDATE MODAL
+let updateIdx = -1;
+function openUpdateModal(idx) {
+  updateIdx = idx;
+  const r = filteredObs[idx];
+  const existing = document.getElementById('obsUpdateModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'obsUpdateModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(13,27,42,0.92);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.innerHTML = `
+    <div style="background:var(--navy-mid);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px">Update Observation #${r.sn}</div>
+        <button onclick="document.getElementById('obsUpdateModal').remove()" style="background:transparent;border:none;color:var(--grey);font-size:20px;cursor:pointer">×</button>
+      </div>
+      <div style="font-size:12px;color:var(--grey-light);margin-bottom:16px;line-height:1.6;padding:12px;background:rgba(255,255,255,0.04);border-radius:8px">${r.task}</div>
+
+      <div class="section-divider" style="margin-top:0">Resort Team Response (filled by GM)</div>
+      <div class="form-grid" style="margin-bottom:16px">
+        <div class="form-group">
+          <label>Task Complete?</label>
+          <select id="upd_resortStatus">
+            <option value="">-- Select --</option>
+            <option value="Yes" ${r.resortStatus==='Yes'?'selected':''}>Yes — Complete</option>
+            <option value="In Progress" ${r.resortStatus==='In Progress'?'selected':''}>In Progress</option>
+            <option value="No" ${r.resortStatus==='No'?'selected':''}>No</option>
+            <option value="More Information required" ${r.resortStatus==='More Information required'?'selected':''}>More Information Required</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Deadline</label>
+          <input type="date" id="upd_deadline" value="${r.deadline||''}">
+        </div>
+        <div class="form-group full">
+          <label>Resort Team Comments</label>
+          <textarea id="upd_resortComment" style="min-height:70px">${r.resortComment||''}</textarea>
+        </div>
+      </div>
+
+      <div class="section-divider">Audit Cross-Verification (filled by Audit)</div>
+      <div class="form-grid" style="margin-bottom:20px">
+        <div class="form-group">
+          <label>Audit Verified Complete?</label>
+          <select id="upd_auditVerified">
+            <option value="">-- Pending --</option>
+            <option value="Yes" ${r.auditVerified==='Yes'?'selected':''}>Yes — Confirmed Complete</option>
+            <option value="No" ${r.auditVerified==='No'?'selected':''}>No — Not Resolved</option>
+            <option value="Resolved" ${r.auditVerified==='Resolved'?'selected':''}>Resolved</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Audit Comments</label>
+          <textarea id="upd_auditComment" style="min-height:70px">${r.auditComment||''}</textarea>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="btn btn-outline" onclick="document.getElementById('obsUpdateModal').remove()">Cancel</button>
+        <button class="btn btn-gold" onclick="saveObsUpdate()">Save Update</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+async function saveObsUpdate() {
+  const r = filteredObs[updateIdx];
+  r.resortStatus   = document.getElementById('upd_resortStatus').value;
+  r.deadline       = document.getElementById('upd_deadline').value;
+  r.resortComment  = document.getElementById('upd_resortComment').value;
+  r.auditVerified  = document.getElementById('upd_auditVerified').value;
+  r.auditComment   = document.getElementById('upd_auditComment').value;
+  r.status         = obsStatusCode(r);
+
+  // Sync back to allObs
+  const masterIdx = allObs.findIndex(o => o.sn === r.sn);
+  if (masterIdx > -1) allObs[masterIdx] = { ...r };
+
+  const result = await gasCall({ action:'updateObservation', observation: r });
+  document.getElementById('obsUpdateModal').remove();
+  toast(`Observation #${r.sn} updated — status: ${r.status}`);
+  renderObs();
+  updateObsKPIs();
+}
+
+function toggleNewObsForm() {
+  const f = document.getElementById('newObsForm');
+  f.style.display = f.style.display === 'none' ? 'block' : 'none';
+  if (f.style.display === 'block') {
+    document.getElementById('no_date').value = new Date().toISOString().split('T')[0];
+  }
+}
+
+async function submitObservation() {
+  const ref  = document.getElementById('no_ref').value.trim();
+  const date = document.getElementById('no_date').value;
+  const dept = document.getElementById('no_dept').value.trim();
+  const task = document.getElementById('no_task').value.trim();
+  if (!ref || !date || !dept || !task) { toast('Please fill all required fields','error'); return; }
+
+  const newObs = {
+    sn: allObs.length + 1,
+    ref, date, dept, task,
+    raisedBy: document.getElementById('no_raisedBy').value,
+    deadline: document.getElementById('no_deadline').value,
+    priority: document.getElementById('no_priority').value,
+    resortStatus:'', resortComment:'', auditVerified:'', auditComment:'',
+    status:'Open'
+  };
+
+  const result = await gasCall({ action:'addObservation', observation: newObs });
+  allObs.unshift(newObs);
+  buildObsFilters();
+  filterObs();
+  updateObsKPIs();
+  document.getElementById('newObsForm').style.display = 'none';
+  ['no_ref','no_dept','no_task','no_deadline'].forEach(id=>document.getElementById(id).value='');
+  toast(`Observation #${newObs.sn} added — ${dept}`,'success');
 }
 </script>
 </body>
