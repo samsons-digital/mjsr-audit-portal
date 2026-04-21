@@ -128,7 +128,7 @@
   }
   .stat-tile.red::before { background: linear-gradient(90deg, var(--red), #e74c3c); }
   .stat-tile.green::before { background: linear-gradient(90deg, var(--green), #2ecc71); }
-  .stat-tile.blue::before { background: linear-gradient(90deg, #2980b9, var(--blue-accent)); }
+  .stat-tile.blue::before { background: linear-gradient(90deg, #1a5276, #2980b9); }
   .stat-tile.amber::before { background: linear-gradient(90deg, var(--amber), #f39c12); }
   .stat-label { font-size:11px; color:var(--grey); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px; }
   .stat-value { font-family:'Syne',sans-serif; font-weight:800; font-size:28px; color:var(--white); line-height:1; }
@@ -454,17 +454,88 @@
 
   <!-- DASHBOARD -->
   <div class="panel active" id="panel-dashboard">
-    <div class="week-selector">
-      <label style="color:var(--grey);font-size:12px;text-transform:uppercase;letter-spacing:.05em">Week Ending:</label>
-      <select id="dashWeekSelect" onchange="loadDashboard()">
-        <option value="">-- Select Week --</option>
+
+    <!-- FILTER BAR -->
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:18px;color:var(--white);flex:1">Resort Overview</div>
+      <select id="dash_rangeFilter" onchange="buildDashboard()" style="max-width:160px;padding:8px 12px;font-size:12px">
+        <option value="season">This Season</option>
+        <option value="30">Last 30 Days</option>
+        <option value="all">All Time</option>
       </select>
-      <button class="btn btn-outline btn-sm" onclick="loadDashboard()">Refresh</button>
+      <select id="dash_deptFilter" onchange="buildDashboard()" style="max-width:180px;padding:8px 12px;font-size:12px">
+        <option value="">All Departments</option>
+      </select>
+      <button class="btn btn-outline btn-sm" onclick="buildDashboard()">↻ Refresh</button>
     </div>
 
-    <div id="dashContent">
-      <div class="empty"><div class="empty-icon">📊</div><p>Select a week to view dashboard</p></div>
+    <!-- SECTION 1: ALWAYS-VISIBLE KPI TILES -->
+    <div class="grid-4" id="dash_kpiTiles">
+      <div class="stat-tile red"><div class="stat-label">Outstanding Observations</div><div class="stat-value" id="dk_outstanding">—</div><div class="stat-sub">require action</div></div>
+      <div class="stat-tile amber"><div class="stat-label">Actioned — Pending Verification</div><div class="stat-value" id="dk_actioned">—</div><div class="stat-sub">awaiting audit sign-off</div></div>
+      <div class="stat-tile green"><div class="stat-label">Audit Verified Complete</div><div class="stat-value" id="dk_verified">—</div><div class="stat-sub">fully closed</div></div>
+      <div class="stat-tile blue"><div class="stat-label">Weeks Reported</div><div class="stat-value" id="dk_weeks">—</div><div class="stat-sub">audit submissions</div></div>
     </div>
+
+    <!-- SECTION 2: OBSERVATION FUNNEL + DEPT BREAKDOWN -->
+    <div class="grid-2" style="margin-bottom:20px">
+
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Observation Status Funnel</div>
+        <div id="dash_funnel"></div>
+        <div style="margin-top:16px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--grey);margin-bottom:6px">
+            <span>COMPLETION RATE</span>
+            <span id="dash_compRate">—</span>
+          </div>
+          <div style="height:8px;background:rgba(0,0,0,0.08);border-radius:4px;overflow:hidden">
+            <div id="dash_compBar" style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--gold-light));transition:width 0.8s ease;width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Top Departments by Outstanding Issues</div>
+        <div class="bar-chart" id="dash_deptChart"></div>
+      </div>
+
+    </div>
+
+    <!-- SECTION 3: RECENT ACTIVITY + REPORT TIMELINE -->
+    <div class="grid-2" style="margin-bottom:20px">
+
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Recent Submissions</div>
+        <div id="dash_recentSubs"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><div class="dot"></div>Validation Status by Week</div>
+        <div id="dash_valStatus"></div>
+      </div>
+
+    </div>
+
+    <!-- SECTION 4: WEEKLY DRILL-DOWN (collapsible) -->
+    <div class="card" style="margin-bottom:4px">
+      <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="toggleWeeklyDrill()">
+        <div class="card-title" style="margin-bottom:0"><div class="dot"></div>Weekly Ticket Report Drill-Down</div>
+        <span id="dash_drillToggle" style="font-size:12px;color:var(--grey)">▼ Expand</span>
+      </div>
+    </div>
+    <div id="dash_weeklySection" style="display:none">
+      <div style="display:flex;align-items:center;gap:12px;margin:12px 0 16px;flex-wrap:wrap">
+        <label style="color:var(--grey);font-size:12px;text-transform:uppercase;letter-spacing:.05em">Week Ending:</label>
+        <select id="dashWeekSelect" onchange="loadWeeklyDrill()" style="max-width:280px">
+          <option value="">-- Select Week --</option>
+        </select>
+        <div id="dash_valBadge"></div>
+      </div>
+      <div id="dashContent">
+        <div class="empty"><div class="empty-icon" style="font-size:32px">📋</div><p>Select a week above to view detailed ticket report</p></div>
+      </div>
+    </div>
+
   </div>
 
   <!-- RESORT DATA ENTRY -->
@@ -926,7 +997,7 @@ function verifyPin() {
     loadWeekOptions();
     loadLog();
     loadReports();
-    loadObservations();
+    loadObservations().then(() => buildDashboard());
     loadValidationWeeks();
     renderConfig();
   } else {
@@ -950,15 +1021,18 @@ function showPanel(id, btn) {
 // ============================================================
 async function gasCall(payload) {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
     const res = await fetch(GAS_URL, {
       method:'POST',
       headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
     return await res.json();
   } catch(e) {
-    // Demo mode fallback
-    return { status:'demo', message:'Demo mode — GAS not connected' };
+    return { status:'demo', message:'GAS unavailable — using local data' };
   }
 }
 
@@ -998,35 +1072,199 @@ function loadWeekOptions() {
 // ============================================================
 // DASHBOARD
 // ============================================================
-async function loadDashboard() {
+let dashObs = [];
+let dashSubs = [];
+let dashDrillOpen = false;
+
+async function buildDashboard() {
+  // Use already-loaded data from other tabs if available
+  dashObs  = allObs.length  ? allObs  : SEED_OBS.map(r=>({...r, status:obsStatusCode(r)}));
+  dashSubs = allSubmissions.length ? allSubmissions : getDemoSubs();
+
+  const range  = document.getElementById('dash_rangeFilter').value;
+  const dept   = document.getElementById('dash_deptFilter').value;
+
+  // Filter obs by dept
+  let obs = dept ? dashObs.filter(o=>o.dept===dept) : dashObs;
+
+  // Filter by date range
+  const now = new Date();
+  if (range === '30') {
+    const cutoff = new Date(now - 30*24*60*60*1000);
+    obs = obs.filter(o => !o.date || new Date(o.date) >= cutoff);
+  } else if (range === 'season') {
+    // Current season: Oct to current month
+    const seasonStart = new Date(now.getFullYear(), 9, 1); // Oct 1
+    if (now.getMonth() < 9) seasonStart.setFullYear(now.getFullYear()-1);
+    obs = obs.filter(o => !o.date || new Date(o.date) >= seasonStart);
+  }
+
+  renderKPIs(obs, dashSubs);
+  renderFunnel(obs);
+  renderDeptChart(obs);
+  renderRecentSubs(dashSubs);
+  renderValStatus(dashSubs);
+  buildDashDeptFilter();
+}
+
+function getDemoSubs() {
+  return [
+    {id:'AR-001',weekNum:'WE 12',weekEnding:'2026-03-29',submittedBy:'Ahmed Qureshi',totalFree:391,grandTotal:1138300,status:'Submitted',timestamp:'2026-03-31 16:32'},
+    {id:'AR-002',weekNum:'WE 11',weekEnding:'2026-03-22',submittedBy:'Ahmed Qureshi',totalFree:302,grandTotal:876400,status:'Submitted',timestamp:'2026-03-24 14:10'},
+    {id:'AR-003',weekNum:'WE 10',weekEnding:'2026-03-15',submittedBy:'SMIA 2',totalFree:278,grandTotal:794600,status:'Submitted',timestamp:'2026-03-17 09:44'},
+  ];
+}
+
+function renderKPIs(obs, subs) {
+  document.getElementById('dk_outstanding').textContent = obs.filter(o=>obsStatusCode(o)==='Open').length.toLocaleString();
+  document.getElementById('dk_actioned').textContent    = obs.filter(o=>obsStatusCode(o)==='Actioned').length.toLocaleString();
+  document.getElementById('dk_verified').textContent    = obs.filter(o=>obsStatusCode(o)==='Verified').length.toLocaleString();
+  document.getElementById('dk_weeks').textContent       = subs.length.toLocaleString();
+}
+
+function renderFunnel(obs) {
+  const total  = obs.length || 1;
+  const open   = obs.filter(o=>obsStatusCode(o)==='Open').length;
+  const prog   = obs.filter(o=>obsStatusCode(o)==='In Progress').length;
+  const act    = obs.filter(o=>obsStatusCode(o)==='Actioned').length;
+  const ver    = obs.filter(o=>obsStatusCode(o)==='Verified').length;
+
+  const stages = [
+    {label:'Outstanding', count:open,   color:'#c0392b', bg:'rgba(192,57,43,0.08)'},
+    {label:'In Progress', count:prog,   color:'#1a5276', bg:'rgba(26,82,118,0.08)'},
+    {label:'Actioned',    count:act,    color:'#d35400', bg:'rgba(211,84,0,0.08)'},
+    {label:'Verified',    count:ver,    color:'#1e8449', bg:'rgba(30,132,73,0.08)'},
+  ];
+
+  document.getElementById('dash_funnel').innerHTML = stages.map(s=>`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div style="width:110px;flex-shrink:0">
+        <div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em">${s.label}</div>
+        <div style="font-size:20px;font-weight:800;font-family:'Syne',sans-serif;color:${s.color}">${s.count}</div>
+      </div>
+      <div style="flex:1;height:28px;background:rgba(0,0,0,0.05);border-radius:5px;overflow:hidden">
+        <div style="height:100%;background:${s.color};opacity:0.85;border-radius:5px;transition:width 0.7s ease;width:${Math.round(s.count/total*100)}%"></div>
+      </div>
+      <div style="font-size:11px;font-weight:600;color:${s.color};width:36px;text-align:right">${Math.round(s.count/total*100)}%</div>
+    </div>`).join('');
+
+  const compRate = Math.round(ver/total*100);
+  document.getElementById('dash_compRate').textContent = compRate + '% complete';
+  document.getElementById('dash_compBar').style.width  = compRate + '%';
+}
+
+function renderDeptChart(obs) {
+  const outstanding = obs.filter(o=>obsStatusCode(o)==='Open');
+  const deptCounts  = {};
+  outstanding.forEach(o => { deptCounts[o.dept] = (deptCounts[o.dept]||0)+1; });
+  const sorted = Object.entries(deptCounts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxVal = sorted[0]?.[1] || 1;
+
+  if (!sorted.length) {
+    document.getElementById('dash_deptChart').innerHTML = '<div style="text-align:center;padding:20px;color:var(--grey);font-size:13px">No outstanding observations</div>';
+    return;
+  }
+
+  document.getElementById('dash_deptChart').innerHTML = sorted.map(([dept,count])=>`
+    <div class="bar-row">
+      <div class="bar-label" title="${dept}" style="width:150px">${dept}</div>
+      <div class="bar-track"><div class="bar-fill red" style="width:${Math.round(count/maxVal*100)}%"></div></div>
+      <div class="bar-val" style="width:30px">${count}</div>
+    </div>`).join('');
+}
+
+function renderRecentSubs(subs) {
+  const recent = [...subs].slice(0,5);
+  if (!recent.length) {
+    document.getElementById('dash_recentSubs').innerHTML = '<div style="color:var(--grey);font-size:13px;padding:10px 0">No submissions yet</div>';
+    return;
+  }
+  document.getElementById('dash_recentSubs').innerHTML = recent.map(r=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="background:rgba(184,146,46,0.1);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-family:'DM Mono',monospace;font-size:11px;font-weight:600;color:var(--gold);flex-shrink:0">${r.weekNum||'—'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:var(--white)">${r.weekEnding}</div>
+        <div style="font-size:11px;color:var(--grey)">${r.submittedBy||'—'}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:12px;font-weight:600;color:var(--gold)">${formatPKR(r.grandTotal||0)} PKR</div>
+        <div style="font-size:11px;color:var(--red)">${(r.totalFree||0).toLocaleString()} free</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderValStatus(subs) {
+  if (!subs.length) {
+    document.getElementById('dash_valStatus').innerHTML = '<div style="color:var(--grey);font-size:13px;padding:10px 0">No submissions yet</div>';
+    return;
+  }
+  document.getElementById('dash_valStatus').innerHTML = subs.slice(0,6).map(r=>{
+    const validated = r.validated || false;
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)">
+      <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);width:50px;flex-shrink:0">${r.weekNum||'—'}</div>
+      <div style="font-size:12px;color:var(--white);flex:1">${r.weekEnding}</div>
+      <div style="font-size:11px;color:var(--grey);flex:1">${r.submittedBy||'—'}</div>
+      <div>${validated
+        ? '<span class="stat-badge badge-green">✅ Validated</span>'
+        : '<span class="stat-badge badge-amber">⏳ Pending</span>'
+      }</div>
+    </div>`; }).join('');
+}
+
+function buildDashDeptFilter() {
+  const sel = document.getElementById('dash_deptFilter');
+  const current = sel.value;
+  const depts = [...new Set(dashObs.map(o=>o.dept).filter(Boolean))].sort();
+  sel.innerHTML = '<option value="">All Departments</option>' +
+    depts.map(d=>`<option value="${d}" ${d===current?'selected':''}>${d}</option>`).join('');
+}
+
+function toggleWeeklyDrill() {
+  dashDrillOpen = !dashDrillOpen;
+  document.getElementById('dash_weeklySection').style.display = dashDrillOpen ? 'block' : 'none';
+  document.getElementById('dash_drillToggle').textContent = dashDrillOpen ? '▲ Collapse' : '▼ Expand';
+}
+
+async function loadWeeklyDrill() {
   const week = document.getElementById('dashWeekSelect').value;
   const container = document.getElementById('dashContent');
-  if (!week) { container.innerHTML = '<div class="empty"><div class="empty-icon">📊</div><p>Select a week to view dashboard</p></div>'; return; }
+  const badge = document.getElementById('dash_valBadge');
+  if (!week) { container.innerHTML = '<div class="empty"><div class="empty-icon" style="font-size:32px">📋</div><p>Select a week above to view detailed ticket report</p></div>'; return; }
 
-  container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading dashboard...</div>';
+  container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading weekly data...</div>';
+  badge.innerHTML = '';
+
   const data = await gasCall({ action:'getDashboard', week });
-
   if (data.status === 'demo' || !data.data) {
-    renderDemoDashboard(container, week);
+    renderWeeklyDrill(container, getDemoWeekData(), week);
   } else {
-    renderDashboard(container, data.data, week);
+    renderWeeklyDrill(container, data.data, week);
+  }
+
+  // Show validation badge
+  const sub = dashSubs.find(s=>s.weekEnding===week);
+  if (sub) {
+    badge.innerHTML = sub.validated
+      ? '<span class="stat-badge badge-green">✅ Audit Validated</span>'
+      : '<span class="stat-badge badge-amber">⏳ Audit Validation Pending</span>';
   }
 }
 
-function renderDemoDashboard(container, week) {
-  const demo = {
-    totalFreeEntrants: 391, totalCompTickets: 5,
-    totalLostRevenue: 1138300, coBreakdown: [
-      {name:'Without permission', entry:387, chair:0, zip:0, gs:0, total:831900, pct:73.1},
-      {name:'Major Iqbal', entry:0, chair:47, zip:1, gs:0, total:133100, pct:11.7},
-      {name:'F & F Policy', entry:0, chair:29, zip:0, gs:0, total:72500, pct:6.4},
-      {name:'Sale Dept & Chairlift', entry:0, chair:16, zip:0, gs:0, total:42700, pct:3.8},
-      {name:'Mr. Sami Ur Rehman', entry:0, chair:13, zip:0, gs:0, total:36400, pct:3.2},
-      {name:'Martin Schultz', entry:0, chair:0, zip:0, gs:5, total:13100, pct:1.2},
-      {name:'Shehzad Alam', entry:4, chair:0, zip:0, gs:0, total:8600, pct:0.8},
+function getDemoWeekData() {
+  return {
+    totalFreeEntrants:391, totalCompTickets:5, totalLostRevenue:1138300,
+    coBreakdown:[
+      {name:'Without permission',entry:387,chair:0,zip:0,gs:0,total:831900,pct:73.1},
+      {name:'Major Iqbal',entry:0,chair:47,zip:1,gs:0,total:133100,pct:11.7},
+      {name:'F & F Policy',entry:0,chair:29,zip:0,gs:0,total:72500,pct:6.4},
+      {name:'Sale Dept & Chairlift',entry:0,chair:16,zip:0,gs:0,total:42700,pct:3.8},
+      {name:'Mr. Sami Ur Rehman',entry:0,chair:13,zip:0,gs:0,total:36400,pct:3.2},
+      {name:'Martin Schultz',entry:0,chair:0,zip:0,gs:5,total:13100,pct:1.2},
+      {name:'Shehzad Alam',entry:4,chair:0,zip:0,gs:0,total:8600,pct:0.8},
     ],
-    categoryBreakdown: [{name:'Local',count:314,pct:80.3},{name:'Police',count:68,pct:17.4},{name:'Tour Operator',count:4,pct:1.0},{name:'Forest Dept',count:5,pct:1.3}],
-    daily: [
+    categoryBreakdown:[{name:'Local',count:314,pct:80.3},{name:'Police',count:68,pct:17.4},{name:'Tour Operator',count:4,pct:1.0},{name:'Forest Dept',count:5,pct:1.3}],
+    daily:[
       {date:'23-Mar',ef:113,ec:0,cf:33,cc:2,zf:0,zc:0,gf:0,gc:0,rev:346600},
       {date:'24-Mar',ef:81,ec:0,cf:22,cc:0,zf:1,zc:0,gf:0,gc:0,rev:245500},
       {date:'25-Mar',ef:58,ec:0,cf:4,cc:0,zf:0,zc:0,gf:0,gc:0,rev:131800},
@@ -1036,38 +1274,19 @@ function renderDemoDashboard(container, week) {
       {date:'29-Mar',ef:27,ec:0,cf:7,cc:2,zf:0,zc:0,gf:0,gc:0,rev:79200},
     ]
   };
-  renderDashboard(container, demo, week);
 }
 
-function renderDashboard(container, d, week) {
-  const maxRev = Math.max(...(d.coBreakdown||[]).map(r=>r.total), 1);
+function renderWeeklyDrill(container, d, week) {
+  const maxRev   = Math.max(...(d.coBreakdown||[]).map(r=>r.total), 1);
   const maxDaily = Math.max(...(d.daily||[]).map(r=>r.rev), 1);
-
   container.innerHTML = `
-  <div class="grid-4">
-    <div class="stat-tile red">
-      <div class="stat-label">Total Free Entrants</div>
-      <div class="stat-value">${(d.totalFreeEntrants||0).toLocaleString()}</div>
-      <div class="stat-sub">persons this week</div>
-    </div>
-    <div class="stat-tile amber">
-      <div class="stat-label">Complimentary Tickets</div>
-      <div class="stat-value">${(d.totalCompTickets||0).toLocaleString()}</div>
-      <div class="stat-sub">comp tickets issued</div>
-    </div>
-    <div class="stat-tile">
-      <div class="stat-label">Lost Revenue (PKR)</div>
-      <div class="stat-value">${formatPKR(d.totalLostRevenue||0)}</div>
-      <div class="stat-sub">total forfeited</div>
-    </div>
-    <div class="stat-tile green">
-      <div class="stat-label">Week Period</div>
-      <div class="stat-value" style="font-size:18px">${week}</div>
-      <div class="stat-sub"><span class="stat-badge badge-gold">AUDIT DATA</span></div>
-    </div>
+  <div class="grid-4" style="margin-bottom:16px">
+    <div class="stat-tile red"><div class="stat-label">Total Free Entrants</div><div class="stat-value">${(d.totalFreeEntrants||0).toLocaleString()}</div><div class="stat-sub">persons this week</div></div>
+    <div class="stat-tile amber"><div class="stat-label">Comp Tickets</div><div class="stat-value">${(d.totalCompTickets||0).toLocaleString()}</div><div class="stat-sub">issued this week</div></div>
+    <div class="stat-tile"><div class="stat-label">Revenue Lost (PKR)</div><div class="stat-value">${formatPKR(d.totalLostRevenue||0)}</div><div class="stat-sub">total forfeited</div></div>
+    <div class="stat-tile green"><div class="stat-label">Period</div><div class="stat-value" style="font-size:16px">${week}</div><div class="stat-sub"><span class="stat-badge badge-gold">TICKET DATA</span></div></div>
   </div>
-
-  <div class="grid-2">
+  <div class="grid-2" style="margin-bottom:16px">
     <div class="card">
       <div class="card-title"><div class="dot"></div>Revenue Lost by C/O</div>
       <div class="bar-chart">
@@ -1091,39 +1310,28 @@ function renderDashboard(container, d, week) {
       </div>
     </div>
   </div>
-
-  <div class="card" style="margin-bottom:20px">
+  <div class="card" style="margin-bottom:16px">
     <div class="card-title"><div class="dot"></div>Daily Revenue Lost</div>
     <div class="vchart">
       ${(d.daily||[]).map(r=>`
         <div class="vbar">
           <div class="vbar-val">${formatPKR(r.rev)}</div>
-          <div class="vbar-fill" style="height:${(r.rev/maxDaily*100).toFixed(0)}px"></div>
+          <div class="vbar-fill" style="height:${Math.max(4,Math.round(r.rev/maxDaily*100))}px"></div>
           <div class="vbar-label">${r.date}</div>
         </div>`).join('')}
     </div>
   </div>
-
   <div class="card">
     <div class="card-title"><div class="dot"></div>Daily Breakdown Table</div>
     <div class="table-wrap">
       <table>
-        <thead><tr>
-          <th>Date</th><th>Entry Free</th><th>Entry Comp</th>
-          <th>Chairlift Free</th><th>Chairlift Comp</th>
-          <th>Zipline Free</th><th>Zipline Comp</th>
-          <th>GS Free</th><th>GS Comp</th><th>Rev Lost</th>
-        </tr></thead>
-        <tbody>
-          ${(d.daily||[]).map(r=>`<tr>
-            <td class="bold">${r.date}</td>
-            <td>${r.ef}</td><td>${r.ec}</td>
-            <td>${r.cf}</td><td>${r.cc}</td>
-            <td>${r.zf}</td><td>${r.zc}</td>
-            <td>${r.gf}</td><td>${r.gc}</td>
-            <td class="bold" style="color:var(--gold-light)">PKR ${r.rev.toLocaleString()}</td>
-          </tr>`).join('')}
-        </tbody>
+        <thead><tr><th>Date</th><th>Entry Free</th><th>Entry Comp</th><th>Chairlift Free</th><th>Chairlift Comp</th><th>Zipline Free</th><th>Zipline Comp</th><th>GS Free</th><th>GS Comp</th><th>Rev Lost</th></tr></thead>
+        <tbody>${(d.daily||[]).map(r=>`<tr>
+          <td class="bold">${r.date}</td>
+          <td>${r.ef}</td><td>${r.ec}</td><td>${r.cf}</td><td>${r.cc}</td>
+          <td>${r.zf}</td><td>${r.zc}</td><td>${r.gf}</td><td>${r.gc}</td>
+          <td class="bold" style="color:var(--gold)">PKR ${r.rev.toLocaleString()}</td>
+        </tr>`).join('')}</tbody>
         <tfoot><tr>
           <td>TOTAL</td>
           <td>${sum(d.daily,'ef')}</td><td>${sum(d.daily,'ec')}</td>
@@ -1134,8 +1342,7 @@ function renderDashboard(container, d, week) {
         </tr></tfoot>
       </table>
     </div>
-  </div>
-  `;
+  </div>`;
 }
 
 function sum(arr, key) { return (arr||[]).reduce((a,r)=>a+(r[key]||0),0); }
@@ -1144,6 +1351,7 @@ function formatPKR(v) {
   if (v >= 1000) return (v/1000).toFixed(0)+'K';
   return v.toString();
 }
+
 
 // ============================================================
 // FORM — CO ROWS
@@ -1421,6 +1629,7 @@ async function loadLog() {
   } else {
     allSubmissions = res.data || [];
     filteredSubmissions = [...allSubmissions];
+    dashSubs = allSubmissions;
     renderLog();
   }
 }
@@ -1926,6 +2135,7 @@ async function loadObservations() {
   if (res.status === 'success' && res.data && res.data.length > 0) {
     allObs = res.data;
   } else {
+    // GAS not connected, sheet empty, or error — use seed data
     allObs = SEED_OBS.map(r => ({ ...r, status: obsStatusCode(r) }));
   }
   buildObsFilters();
