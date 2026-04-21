@@ -2282,97 +2282,150 @@ function printObservations() {
   const status = document.getElementById('obsStatusFilter').value;
   const dept   = document.getElementById('obsDeptFilter').value;
 
-  // Build print title
-  let titleParts = ['Audit Observations Report'];
+  // Build title
+  let reportTitle = 'Audit Observations Report';
   if (month) {
     const [y, mo] = month.split('-');
-    titleParts = [new Date(+y, +mo-1, 1).toLocaleDateString('en-PK', { month:'long', year:'numeric' }) + ' — Observations Report'];
+    reportTitle = new Date(+y, +mo-1, 1).toLocaleDateString('en-PK', { month:'long', year:'numeric' }) + ' — Audit Observations Report';
   }
-  if (dept) titleParts.push(dept);
-  if (status) titleParts.push(status);
+  const subtitleParts = [];
+  if (dept)   subtitleParts.push(dept);
+  if (status) subtitleParts.push(status);
 
-  // Build meta line
-  const total = filteredObs.length;
-  const open  = filteredObs.filter(r=>obsStatusCode(r)==='Open').length;
-  const ver   = filteredObs.filter(r=>obsStatusCode(r)==='Verified').length;
-  const meta  = `${total} observations  |  ${open} outstanding  |  ${ver} verified`;
+  const total    = filteredObs.length;
+  const open     = filteredObs.filter(r=>obsStatusCode(r)==='Open').length;
+  const inProg   = filteredObs.filter(r=>obsStatusCode(r)==='In Progress').length;
+  const actioned = filteredObs.filter(r=>obsStatusCode(r)==='Actioned').length;
+  const ver      = filteredObs.filter(r=>obsStatusCode(r)==='Verified').length;
+  const printDate = new Date().toLocaleDateString('en-PK', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
 
-  // Set print header content
-  document.getElementById('print-title').textContent = titleParts.join(' — ');
-  document.getElementById('print-meta').textContent  = meta;
-  document.getElementById('print-date').textContent  = new Date().toLocaleDateString('en-PK', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const statusColor = c => c==='Open'?'#c0392b':c==='Actioned'?'#d35400':c==='Verified'?'#1e8449':c==='In Progress'?'#1a5276':'#666';
+  const priColor    = p => p==='High'?'#c0392b':p==='Low'?'#1e8449':'#d35400';
 
-  // Temporarily render ALL filtered observations (remove pagination for print)
-  const savedPage = obsPage;
-  const savedObs  = filteredObs;
+  // Build rows — each observation is a full-width card row so text never truncates
+  const rows = filteredObs.map((r, i) => {
+    const code = obsStatusCode(r);
+    const sc   = statusColor(code);
+    const pc   = priColor(r.priority);
+    const bg   = i%2===0 ? '#ffffff' : '#faf8f5';
+    return `
+      <div style="background:${bg};border-bottom:1px solid #e8e4de;padding:10px 12px;break-inside:avoid;page-break-inside:avoid">
+        <div style="display:flex;align-items:flex-start;gap:12px">
 
-  // Build a full print table in a hidden div
-  let printTable = `
-    <div id="obs-print-table" style="margin-top:16px">
-      <table style="width:100%;border-collapse:collapse;font-size:9pt">
-        <thead>
-          <tr>
-            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:40px">S/N</th>
-            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:120px">Report</th>
-            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:130px">Department</th>
-            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left">Observation</th>
-            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:80px">Date</th>
-            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:65px">Priority</th>
-            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:90px">Status</th>
-            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:65px">Verified</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${filteredObs.map((r,i) => {
-            const code = obsStatusCode(r);
-            const rowBg = i%2===0 ? '#ffffff' : '#f9f7f4';
-            const statusColor = code==='Open'?'#c0392b':code==='Actioned'?'#d35400':code==='Verified'?'#1e8449':'#1a5276';
-            return `<tr style="background:${rowBg}">
-              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:600">${r.sn}</td>
-              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8pt;color:#555">${r.ref||'—'}</td>
-              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8.5pt">${r.dept||'—'}</td>
-              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8.5pt;line-height:1.4">${r.task||'—'}</td>
-              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8pt;color:#555">${r.date||'—'}</td>
-              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8pt;font-weight:600;color:${r.priority==='High'?'#c0392b':r.priority==='Low'?'#1e8449':'#d35400'}">${r.priority||'—'}</td>
-              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8pt;font-weight:600;color:${statusColor}">${code}</td>
-              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8pt;font-weight:600;color:${r.auditVerified?'#1e8449':'#999'}">${r.auditVerified||'Pending'}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
-        <tfoot>
-          <tr style="background:#f5f3ee">
-            <td colspan="3" style="padding:8px;font-weight:700;font-size:9pt;border-top:2px solid #b8922e">TOTAL: ${filteredObs.length} observations</td>
-            <td colspan="2" style="padding:8px;font-size:9pt;border-top:2px solid #b8922e">${open} outstanding</td>
-            <td colspan="3" style="padding:8px;font-size:9pt;border-top:2px solid #b8922e;font-weight:700;color:#1e8449">${ver} verified complete</td>
-          </tr>
-        </tfoot>
-      </table>
-      ${filteredObs.some(r=>r.resortComment||r.auditComment) ? `
-      <div style="margin-top:20px;page-break-before:always">
-        <div style="font-size:12pt;font-weight:700;color:#b8922e;border-bottom:1px solid #b8922e;padding-bottom:6px;margin-bottom:12px">Detailed Comments</div>
-        ${filteredObs.filter(r=>r.resortComment||r.auditComment).map(r=>`
-          <div style="margin-bottom:10px;padding:8px 10px;border:1px solid #ddd;border-radius:4px;break-inside:avoid">
-            <div style="font-weight:700;font-size:9pt;margin-bottom:4px">#${r.sn} — ${r.dept}</div>
-            <div style="font-size:8.5pt;color:#333;margin-bottom:4px;line-height:1.4">${r.task}</div>
-            ${r.resortComment ? `<div style="font-size:8pt;margin-top:4px"><strong>Resort:</strong> ${r.resortComment}</div>` : ''}
-            ${r.auditComment  ? `<div style="font-size:8pt;margin-top:2px"><strong>Audit:</strong> ${r.auditComment}</div>` : ''}
-          </div>`).join('')}
-      </div>` : ''}
-    </div>`;
+          <!-- LEFT: S/N + meta -->
+          <div style="flex-shrink:0;width:36px;text-align:center">
+            <div style="font-size:13pt;font-weight:700;color:#b8922e;line-height:1">${r.sn}</div>
+          </div>
 
-  // Inject into observations panel for print
-  const existing = document.getElementById('obs-print-table');
-  if (existing) existing.remove();
-  document.querySelector('#panel-observations .card').insertAdjacentHTML('beforeend', printTable);
+          <!-- CENTRE: Observation text + dept/ref -->
+          <div style="flex:1;min-width:0">
+            <div style="font-size:9pt;color:#1a1a18;line-height:1.5;margin-bottom:5px">${r.task||'—'}</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
+              <span style="font-size:7.5pt;color:#888">📁 ${r.dept||'—'}</span>
+              <span style="font-size:7.5pt;color:#888">📄 ${r.ref||'—'}</span>
+              <span style="font-size:7.5pt;color:#888">📅 ${r.date||'—'}</span>
+            </div>
+            ${(r.resortComment||r.auditComment) ? `
+            <div style="margin-top:6px;padding:5px 8px;background:#f5f3ee;border-left:3px solid #b8922e;border-radius:0 4px 4px 0">
+              ${r.resortComment ? `<div style="font-size:7.5pt;color:#333;line-height:1.4"><strong>Resort:</strong> ${r.resortComment}</div>` : ''}
+              ${r.auditComment  ? `<div style="font-size:7.5pt;color:#333;line-height:1.4;margin-top:2px"><strong>Audit:</strong> ${r.auditComment}</div>` : ''}
+            </div>` : ''}
+          </div>
 
-  window.print();
+          <!-- RIGHT: Status badges -->
+          <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:90px">
+            <span style="font-size:7.5pt;font-weight:700;color:${pc};border:1px solid ${pc};padding:2px 7px;border-radius:10px;white-space:nowrap">${r.priority||'—'}</span>
+            <span style="font-size:7.5pt;font-weight:700;color:${sc};border:1px solid ${sc};padding:2px 7px;border-radius:10px;white-space:nowrap">${code}</span>
+            <span style="font-size:7.5pt;font-weight:700;color:${r.auditVerified?'#1e8449':'#999'};border:1px solid ${r.auditVerified?'#1e8449':'#ddd'};padding:2px 7px;border-radius:10px;white-space:nowrap">${r.auditVerified?'✓ Verified':'Pending'}</span>
+          </div>
 
-  // Clean up after print
-  setTimeout(() => {
-    const tbl = document.getElementById('obs-print-table');
-    if (tbl) tbl.remove();
-  }, 1000);
+        </div>
+      </div>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${reportTitle}</title>
+<style>
+  @page { size: A4 portrait; margin: 15mm 12mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: Arial, sans-serif; font-size: 9pt; color: #1a1a18; background: #fff; }
+  .print-header { border-bottom: 2.5px solid #b8922e; padding-bottom: 12px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: flex-start; }
+  .header-left h1 { font-size: 16pt; font-weight: 700; color: #b8922e; margin-bottom: 2px; }
+  .header-left p  { font-size: 9pt; color: #666; }
+  .header-right   { text-align: right; }
+  .header-right .report-title { font-size: 12pt; font-weight: 700; color: #1a1a18; margin-bottom: 3px; }
+  .header-right .report-sub   { font-size: 8.5pt; color: #666; margin-bottom: 2px; }
+  .summary-bar { display: flex; gap: 0; margin-bottom: 14px; border: 1px solid #e0dcd4; border-radius: 6px; overflow: hidden; }
+  .summary-cell { flex: 1; padding: 8px 10px; text-align: center; border-right: 1px solid #e0dcd4; }
+  .summary-cell:last-child { border-right: none; }
+  .summary-cell .val { font-size: 16pt; font-weight: 700; line-height: 1; }
+  .summary-cell .lbl { font-size: 7pt; text-transform: uppercase; letter-spacing: .04em; color: #888; margin-top: 2px; }
+  .col-headers { display: flex; background: #2c2c2c; color: #fff; padding: 7px 12px; font-size: 7.5pt; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; border-radius: 4px 4px 0 0; }
+  .ch-sn   { width: 48px; flex-shrink: 0; }
+  .ch-obs  { flex: 1; }
+  .ch-meta { width: 90px; flex-shrink: 0; text-align: right; }
+  .footer { margin-top: 16px; padding-top: 8px; border-top: 1px solid #e0dcd4; display: flex; justify-content: space-between; font-size: 7.5pt; color: #999; }
+  .totals-bar { background: #f5f3ee; border: 1px solid #e0dcd4; border-top: 2px solid #b8922e; padding: 8px 12px; display: flex; gap: 20px; font-size: 8.5pt; border-radius: 0 0 4px 4px; }
+  .totals-bar strong { color: #1a1a18; }
+</style>
+</head>
+<body>
+
+  <div class="print-header">
+    <div class="header-left">
+      <h1>MJSR Audit Portal</h1>
+      <p>Malam Jabba Ski Resort &mdash; Samsons Group of Companies</p>
+    </div>
+    <div class="header-right">
+      <div class="report-title">${reportTitle}</div>
+      ${subtitleParts.length ? `<div class="report-sub">${subtitleParts.join(' &nbsp;·&nbsp; ')}</div>` : ''}
+      <div class="report-sub">Printed: ${printDate}</div>
+    </div>
+  </div>
+
+  <div class="summary-bar">
+    <div class="summary-cell"><div class="val" style="color:#1a1a18">${total}</div><div class="lbl">Total</div></div>
+    <div class="summary-cell"><div class="val" style="color:#c0392b">${open}</div><div class="lbl">Outstanding</div></div>
+    <div class="summary-cell"><div class="val" style="color:#1a5276">${inProg}</div><div class="lbl">In Progress</div></div>
+    <div class="summary-cell"><div class="val" style="color:#d35400">${actioned}</div><div class="lbl">Actioned</div></div>
+    <div class="summary-cell"><div class="val" style="color:#1e8449">${ver}</div><div class="lbl">Verified</div></div>
+  </div>
+
+  <div class="col-headers">
+    <div class="ch-sn">S/N</div>
+    <div class="ch-obs">Observation &nbsp;·&nbsp; Department &nbsp;·&nbsp; Report &nbsp;·&nbsp; Date &nbsp;·&nbsp; Comments</div>
+    <div class="ch-meta">Priority / Status</div>
+  </div>
+
+  <div style="border:1px solid #e0dcd4;border-top:none;border-radius:0 0 4px 4px;overflow:hidden">
+    ${rows || '<div style="padding:20px;text-align:center;color:#999;font-size:9pt">No observations match the selected filters.</div>'}
+  </div>
+
+  <div class="totals-bar">
+    <span><strong>${total}</strong> observations printed</span>
+    <span><strong style="color:#c0392b">${open}</strong> outstanding</span>
+    <span><strong style="color:#d35400">${actioned}</strong> actioned — pending verification</span>
+    <span><strong style="color:#1e8449">${ver}</strong> audit verified complete</span>
+  </div>
+
+  <div class="footer">
+    <span>MJSR Audit Portal &mdash; samsons-digital.github.io/mjsr-audit-portal/</span>
+    <span>Confidential &mdash; Internal Use Only</span>
+    <span>${printDate}</span>
+  </div>
+
+</body>
+</html>`;
+
+  const win = window.open('', '_blank', 'width=900,height=700');
+  win.document.write(html);
+  win.document.close();
+  win.onload = () => { win.focus(); win.print(); };
 }
+
 
 
 function updateObsKPIs() {
