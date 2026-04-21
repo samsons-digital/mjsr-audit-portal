@@ -82,6 +82,8 @@
   }
   .nav-tab:hover { color: var(--white); }
   .nav-tab.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+  .nav-tab.locked-tab { opacity: 0.6; }
+  .nav-tab.locked-tab:hover { opacity: 1; }
 
   /* MAIN */
   .main { max-width:1400px; margin:0 auto; padding:28px 32px; }
@@ -457,14 +459,18 @@
 </div>
 
 <!-- PIN MODAL -->
-<div class="modal-overlay" id="pinModal">
+<!-- PIN MODAL — for locked tabs only -->
+<div class="modal-overlay" id="pinModal" style="display:none">
   <div class="modal">
-    <div style="font-size:40px;margin-bottom:12px">🔒</div>
-    <h3>Audit Portal Access</h3>
-    <p>Enter your PIN to access the MJSR Audit Portal</p>
+    <div style="font-size:40px;margin-bottom:12px">🔐</div>
+    <h3>Restricted Area</h3>
+    <p>This section is for Audit &amp; Management only.<br>Enter your PIN to continue.</p>
     <input type="password" class="pin-input" id="pinInput" maxlength="6" placeholder="• • • •" autocomplete="off">
     <div class="pin-error" id="pinError">Incorrect PIN. Please try again.</div>
-    <button class="btn btn-gold" style="width:100%" onclick="verifyPin()">Unlock Portal</button>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn btn-outline" style="flex:1" onclick="cancelPinModal()">Cancel</button>
+      <button class="btn btn-gold" style="flex:2" onclick="verifyPin()">Unlock</button>
+    </div>
   </div>
 </div>
 
@@ -487,20 +493,20 @@
 <!-- NAV -->
 <nav class="nav-tabs">
   <div class="nav-inner">
-    <button class="nav-tab active" onclick="showPanel('dashboard',this)">📊 Dashboard</button>
-    <button class="nav-tab" onclick="showPanel('submit',this)">📝 Resort Data Entry</button>
-    <button class="nav-tab" onclick="showPanel('validate',this)">✔ Audit Validation</button>
-    <button class="nav-tab" onclick="showPanel('observations',this)">🔍 Observations</button>
-    <button class="nav-tab" onclick="showPanel('log',this)">📋 Submission Log</button>
-    <button class="nav-tab" onclick="showPanel('reports',this)">📈 Weekly Reports</button>
-    <button class="nav-tab" onclick="showPanel('config',this)">⚙️ Config</button>
+    <button class="nav-tab" onclick="showPanel('submit',this)" id="tab-submit">📝 Resort Data Entry</button>
+    <button class="nav-tab locked-tab" onclick="requestPin('dashboard',this)" id="tab-dashboard">📊 Dashboard 🔒</button>
+    <button class="nav-tab locked-tab" onclick="requestPin('validate',this)" id="tab-validate">✔ Audit Validation 🔒</button>
+    <button class="nav-tab locked-tab" onclick="requestPin('observations',this)" id="tab-observations">🔍 Observations 🔒</button>
+    <button class="nav-tab locked-tab" onclick="requestPin('log',this)" id="tab-log">📋 Submission Log 🔒</button>
+    <button class="nav-tab locked-tab" onclick="requestPin('reports',this)" id="tab-reports">📈 Weekly Reports 🔒</button>
+    <button class="nav-tab locked-tab" onclick="requestPin('config',this)" id="tab-config">⚙️ Config 🔒</button>
   </div>
 </nav>
 
 <main class="main">
 
   <!-- DASHBOARD -->
-  <div class="panel active" id="panel-dashboard">
+  <div class="panel" id="panel-dashboard">
 
     <!-- FILTER BAR -->
     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px">
@@ -1007,11 +1013,17 @@ let priceAuditHistory = [];
 // ============================================================
 // INIT
 // ============================================================
+let isUnlocked = false;
+let pendingPanel = null;
+let pendingBtn   = null;
+
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('pinInput').addEventListener('keydown', e => { if(e.key==='Enter') verifyPin(); });
   document.getElementById('f_submDate').value = new Date().toISOString().split('T')[0];
   updateWeekBadge();
   renderCoDropdown();
+  // Open on Resort Data Entry by default — no PIN required
+  showPanel('submit', document.getElementById('tab-submit'));
 });
 
 function updateWeekBadge() {
@@ -1021,23 +1033,60 @@ function updateWeekBadge() {
 }
 
 // ============================================================
-// PIN
+// PIN — only triggered when a locked tab is clicked
 // ============================================================
+function requestPin(panelId, btn) {
+  if (isUnlocked) {
+    // Already authenticated this session — go straight in
+    showPanel(panelId, btn);
+    return;
+  }
+  // Store where we want to go after unlock
+  pendingPanel = panelId;
+  pendingBtn   = btn;
+  document.getElementById('pinError').style.display = 'none';
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('pinInput').focus(), 100);
+}
+
 function verifyPin() {
   const val = document.getElementById('pinInput').value;
   const err = document.getElementById('pinError');
   if (val === CORRECT_PIN || val === '1234') {
+    isUnlocked = true;
     document.getElementById('pinModal').style.display = 'none';
+    // Remove lock icons from tabs now that session is unlocked
+    document.querySelectorAll('.locked-tab').forEach(t => {
+      t.textContent = t.textContent.replace(' 🔒','');
+      t.classList.remove('locked-tab');
+      t.classList.add('unlocked-tab');
+    });
+    // Load all data
     loadWeekOptions();
     loadLog();
     loadReports();
     loadObservations().then(() => buildDashboard());
     loadValidationWeeks();
     renderConfig();
+    // Navigate to the tab that was clicked
+    if (pendingPanel && pendingBtn) {
+      showPanel(pendingPanel, pendingBtn);
+      pendingPanel = null;
+      pendingBtn   = null;
+    }
   } else {
     err.style.display = 'block';
     document.getElementById('pinInput').value = '';
   }
+}
+
+function cancelPinModal() {
+  document.getElementById('pinModal').style.display = 'none';
+  document.getElementById('pinInput').value = '';
+  document.getElementById('pinError').style.display = 'none';
+  pendingPanel = null;
+  pendingBtn   = null;
 }
 
 // ============================================================
@@ -1049,6 +1098,7 @@ function showPanel(id, btn) {
   document.getElementById('panel-'+id).classList.add('active');
   btn.classList.add('active');
 }
+
 
 // ============================================================
 // GAS CALL
@@ -2014,6 +2064,7 @@ function addSubmitter() {
   submitters.push(v);
   document.getElementById('newSubmitter').value='';
   renderSubmitterList();
+  renderCoDropdown();
   toast(`Submitter "${v}" added`);
 }
 
