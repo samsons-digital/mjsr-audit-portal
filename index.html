@@ -1068,7 +1068,7 @@ function verifyPin() {
     loadReports();
     loadObservations().then(() => buildDashboard());
     loadValidationWeeks();
-    renderConfig();
+    loadConfigFromGAS();
     // Navigate to the tab that was clicked
     if (pendingPanel && pendingBtn) {
       showPanel(pendingPanel, pendingBtn);
@@ -1821,6 +1821,38 @@ async function loadReports() {
 // ============================================================
 // CONFIG
 // ============================================================
+async function loadConfigFromGAS() {
+  const res = await gasCall({ action:'getConfig' });
+  if (res.status === 'success' && res.data) {
+    const d = res.data;
+
+    // Submitters
+    if (d.submitters) {
+      try {
+        const s = JSON.parse(d.submitters);
+        if (Array.isArray(s) && s.length) submitters = s;
+      } catch(e){}
+    }
+
+    // C/O Personnel
+    if (d.coPersonnel) {
+      try {
+        const c = JSON.parse(d.coPersonnel);
+        if (Array.isArray(c) && c.length) coPersonnel = c;
+      } catch(e){}
+    }
+
+    // WD/WE Prices
+    const wdKeys = ['entry','chair','zip','gs','ss'];
+    wdKeys.forEach(k => {
+      if (d['price_wd_'+k]) prices.wd[k] = +d['price_wd_'+k];
+      if (d['price_we_'+k]) prices.we[k] = +d['price_we_'+k];
+    });
+  }
+  renderConfig();
+  renderCoDropdown();
+}
+
 function renderConfig() {
   renderCoList(); renderSubmitterList();
   const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
@@ -2034,7 +2066,7 @@ function renderCoList() {
   document.getElementById('coList').innerHTML = coPersonnel.map((c,i)=>`
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
       <span>${c}</span>
-      <button class="remove-btn" onclick="coPersonnel.splice(${i},1);renderCoList();renderCoDropdown()">×</button>
+      <button class="remove-btn" onclick="coPersonnel.splice(${i},1);renderCoList();renderCoDropdown();gasCall({action:'saveConfig',config:{submitters:JSON.stringify(submitters),coPersonnel:JSON.stringify(coPersonnel)}})">×</button>
     </div>`).join('');
 }
 
@@ -2044,7 +2076,7 @@ function renderSubmitterList() {
   document.getElementById('submitterList').innerHTML = submitters.map((s,i)=>`
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
       <span>${s}</span>
-      <button class="remove-btn" onclick="submitters.splice(${i},1);renderSubmitterList()">×</button>
+      <button class="remove-btn" onclick="submitters.splice(${i},1);renderSubmitterList();gasCall({action:'saveConfig',config:{submitters:JSON.stringify(submitters),coPersonnel:JSON.stringify(coPersonnel)}})">×</button>
     </div>`).join('');
   renderCoDropdown();
 }
@@ -2055,6 +2087,7 @@ function addCoPerson() {
   coPersonnel.push(v);
   document.getElementById('newCoName').value='';
   renderCoList(); renderCoDropdown();
+  gasCall({ action:'saveConfig', config: { submitters: JSON.stringify(submitters), coPersonnel: JSON.stringify(coPersonnel) } });
   toast(`C/O "${v}" added`);
 }
 
@@ -2065,6 +2098,7 @@ function addSubmitter() {
   document.getElementById('newSubmitter').value='';
   renderSubmitterList();
   renderCoDropdown();
+  gasCall({ action:'saveConfig', config: { submitters: JSON.stringify(submitters), coPersonnel: JSON.stringify(coPersonnel) } });
   toast(`Submitter "${v}" added`);
 }
 
