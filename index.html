@@ -587,24 +587,27 @@
 
   <!-- RESORT DATA ENTRY -->
   <div class="panel" id="panel-submit">
-    <div class="card">
-      <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.25);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
-        <span style="font-size:18px">🏔️</span>
-        <div>
-          <div style="font-size:12px;font-weight:600;color:#60a5fa;text-transform:uppercase;letter-spacing:.05em">Resort Team Data Entry</div>
-          <div style="font-size:12px;color:var(--grey);margin-top:2px">This form is completed by the Resort Operations Team. Once submitted, the Audit Team validates the data via the Audit Validation tab.</div>
-        </div>
-      </div>
-      <div class="card-title"><div class="dot"></div>Weekly Free &amp; Complimentary Ticket Report</div>
 
+    <!-- INFO BANNER -->
+    <div style="background:rgba(26,82,118,0.08);border:1px solid rgba(26,82,118,0.2);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">🏔️</span>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:#1a5276;text-transform:uppercase;letter-spacing:.05em">Resort Gate Team — Daily Free Entry Log</div>
+        <div style="font-size:12px;color:var(--grey);margin-top:2px">Record each free or complimentary entry as it happens. Financial impact is calculated automatically. Audit team validates the following day.</div>
+      </div>
+    </div>
+
+    <!-- REPORT HEADER — set once per session -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title"><div class="dot"></div>Report Details</div>
       <div class="form-grid">
         <div class="form-group">
-          <label>Week Ending Date *</label>
+          <label>Date *</label>
           <input type="date" id="f_weekEnding" onchange="onWeekEndingChange()">
         </div>
         <div class="form-group">
-          <label>Week Number <span style="color:var(--gold);font-size:10px">(auto)</span></label>
-          <input type="text" id="f_weekNum" placeholder="Auto-fills from date" readonly style="opacity:.8;background:rgba(0,0,0,0.04)">
+          <label>Week <span style="color:var(--gold);font-size:10px">(auto)</span></label>
+          <input type="text" id="f_weekNum" readonly style="opacity:.7;background:rgba(0,0,0,0.04)">
         </div>
         <div class="form-group">
           <label>Submitted By *</label>
@@ -617,134 +620,65 @@
           <input type="date" id="f_submDate" readonly>
         </div>
       </div>
-
-      <!-- RATE TYPE INDICATOR -->
-      <div id="f_rateIndicator" style="display:none;margin-bottom:16px;padding:10px 16px;border-radius:8px;display:flex;align-items:center;gap:10px">
-        <span id="f_rateIcon" style="font-size:18px"></span>
-        <div>
-          <div id="f_rateTitle" style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em"></div>
-          <div id="f_rateSub" style="font-size:11px;margin-top:1px"></div>
-        </div>
-        <div style="margin-left:auto;display:flex;gap:16px" id="f_ratePrices"></div>
+      <!-- Rate indicator -->
+      <div id="f_rateIndicator" style="display:none;margin-top:12px;padding:8px 14px;border-radius:6px;display:flex;align-items:center;gap:8px">
+        <span id="f_rateIcon" style="font-size:16px"></span>
+        <div id="f_rateTitle" style="font-size:12px;font-weight:700"></div>
+        <div id="f_rateSub" style="font-size:11px;color:var(--grey);margin-left:4px"></div>
+        <div style="margin-left:auto" id="f_ratePrices" style="font-size:11px"></div>
       </div>
+    </div>
 
-      <!-- SECTION: FREE ENTRANT SUMMARY -->
-      <div class="section-divider">1. Free Entrant Summary (by Authorising C/O)</div>
-      <div id="coRows"></div>
-      <button class="btn btn-outline btn-sm" style="margin-bottom:16px" onclick="addCoRow()">+ Add C/O Row</button>
+    <!-- ENTRY LOG — one card per entry -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--white)">Free Entry Log <span id="entryCount" style="font-size:12px;color:var(--grey);font-weight:400;margin-left:6px">0 entries</span></div>
+      <button class="btn btn-gold btn-sm" onclick="addEntryCard()">+ Add Entry</button>
+    </div>
 
-      <!-- SECTION: FREE CATEGORY ANALYSIS -->
-      <div class="section-divider">2. Free Entrant Analysis (by Type)</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Local (persons)</label>
-          <input type="number" id="f_local" min="0" value="0" onchange="calcAnalysis()">
+    <div id="entryCards"></div>
+
+    <!-- RUNNING TOTALS -->
+    <div class="card" id="runningTotals" style="margin-top:16px;display:none">
+      <div class="card-title"><div class="dot"></div>Today's Running Total <span style="font-size:11px;font-weight:400;color:var(--grey);text-transform:none;letter-spacing:0">(auto-calculated)</span></div>
+      <div class="grid-4">
+        <div class="stat-tile red" style="padding:14px">
+          <div class="stat-label">Free Entrants</div>
+          <div class="stat-value" id="rt_freeTotal" style="font-size:22px">0</div>
         </div>
-        <div class="form-group">
-          <label>Police (persons)</label>
-          <input type="number" id="f_police" min="0" value="0" onchange="calcAnalysis()">
+        <div class="stat-tile amber" style="padding:14px">
+          <div class="stat-label">Comp Tickets</div>
+          <div class="stat-value" id="rt_compTotal" style="font-size:22px">0</div>
         </div>
-        <div class="form-group">
-          <label>Tour Operator (persons)</label>
-          <input type="number" id="f_tourOp" min="0" value="0" onchange="calcAnalysis()">
+        <div class="stat-tile" style="padding:14px">
+          <div class="stat-label">Revenue Impact (PKR)</div>
+          <div class="stat-value" id="rt_revTotal" style="font-size:22px">0</div>
         </div>
-        <div class="form-group">
-          <label>Forest Department (persons)</label>
-          <input type="number" id="f_forestDept" min="0" value="0" onchange="calcAnalysis()">
-        </div>
-        <div class="form-group">
-          <label>Other (persons)</label>
-          <input type="number" id="f_otherFree" min="0" value="0" onchange="calcAnalysis()">
-        </div>
-        <div class="form-group">
-          <label>Total Free Entrants</label>
-          <input type="number" id="f_totalFree" readonly style="opacity:.7">
+        <div class="stat-tile green" style="padding:14px">
+          <div class="stat-label">Entries Logged</div>
+          <div class="stat-value" id="rt_entryCount" style="font-size:22px">0</div>
         </div>
       </div>
+    </div>
 
-      <!-- SECTION: DAILY BREAKDOWN -->
-      <div class="section-divider">3. Daily Breakdown (Free + Complimentary)</div>
-      <div style="overflow-x:auto;margin-bottom:16px">
-        <table id="dailyTable">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Arrival Time</th>
-              <th>Entry Free</th><th>Entry Comp</th>
-              <th>Chairlift Free</th><th>Chairlift Comp</th>
-              <th>Zipline Free</th><th>Zipline Comp</th>
-              <th>Giant Swing Free</th><th>Giant Swing Comp</th>
-              <th>Total Free</th><th>Total Comp</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="dailyRows"></tbody>
-          <tfoot>
-            <tr>
-              <td>TOTAL</td>
-              <td></td>
-              <td id="tot_ef">0</td><td id="tot_ec">0</td>
-              <td id="tot_cf">0</td><td id="tot_cc">0</td>
-              <td id="tot_zf">0</td><td id="tot_zc">0</td>
-              <td id="tot_gf">0</td><td id="tot_gc">0</td>
-              <td id="tot_tf">0</td><td id="tot_tc">0</td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-      <button class="btn btn-outline btn-sm" style="margin-bottom:16px" onclick="addDailyRow()">+ Add Day</button>
+    <!-- NOTES -->
+    <div class="card" style="margin-top:16px">
+      <div class="card-title"><div class="dot"></div>Notes / Irregularities (optional)</div>
+      <textarea id="f_observations" placeholder="Any additional observations for the Audit team..." style="width:100%;min-height:70px"></textarea>
+    </div>
 
-      <!-- SECTION: CHILDREN OVER AGE -->
-      <div class="section-divider">4. Over-Age Children (Exempt Age &gt; 5 Years)</div>
-      <div id="childRows"></div>
-      <button class="btn btn-outline btn-sm" style="margin-bottom:16px" onclick="addChildRow()">+ Add Child Case</button>
+    <div style="display:flex;gap:12px;margin-top:20px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="clearForm()">Clear All</button>
+      <button class="btn btn-gold" onclick="submitReport()">Submit to Audit</button>
+    </div>
 
-      <!-- SECTION: COMP TICKET DETAIL -->
-      <div class="section-divider">5. Complimentary Ticket Detail (Chairlift)</div>
-      <div id="compRows"></div>
-      <button class="btn btn-outline btn-sm" style="margin-bottom:16px" onclick="addCompRow()">+ Add Comp Entry</button>
-
-      <!-- SECTION: OBSERVATIONS -->
-      <div class="section-divider">6. Audit Observations / Notes</div>
-      <div class="form-group full" style="margin-bottom:16px">
-        <label>Observations / Irregularities</label>
-        <textarea id="f_observations" placeholder="Enter any audit observations, irregularities, or notes for this week..."></textarea>
-      </div>
-
-      <!-- TOTALS SUMMARY -->
-      <div class="section-divider">7. Financial Summary</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Total Entry Revenue (Free Lost) PKR</label>
-          <input type="number" id="f_entryRev" min="0" value="0">
-        </div>
-        <div class="form-group">
-          <label>Total Chairlift Revenue (Free Lost) PKR</label>
-          <input type="number" id="f_chairRev" min="0" value="0">
-        </div>
-        <div class="form-group">
-          <label>Total Zipline Revenue (Free Lost) PKR</label>
-          <input type="number" id="f_zipRev" min="0" value="0">
-        </div>
-        <div class="form-group">
-          <label>Total Giant Swing Revenue (Free Lost) PKR</label>
-          <input type="number" id="f_gsRev" min="0" value="0">
-        </div>
-        <div class="form-group">
-          <label>Grand Total Lost Revenue PKR</label>
-          <input type="number" id="f_grandTotal" readonly style="opacity:.7;font-weight:700;color:var(--gold-light)">
-        </div>
-        <div class="form-group">
-          <label>Total Comp Tickets Value PKR</label>
-          <input type="number" id="f_compTotal" min="0" value="0">
-        </div>
-      </div>
-
-      <div style="display:flex;gap:12px;margin-top:24px;justify-content:flex-end">
-        <button class="btn btn-outline" onclick="clearForm()">Clear Form</button>
-        <button class="btn btn-gold" onclick="submitReport()">Submit Audit Report</button>
-      </div>
+    <!-- HIDDEN FIELDS kept for backward compat with submitReport() -->
+    <div style="display:none">
+      <input id="f_local" value="0"><input id="f_police" value="0">
+      <input id="f_tourOp" value="0"><input id="f_forestDept" value="0">
+      <input id="f_otherFree" value="0"><input id="f_totalFree" value="0">
+      <input id="f_entryRev" value="0"><input id="f_chairRev" value="0">
+      <input id="f_zipRev" value="0"><input id="f_gsRev" value="0">
+      <input id="f_grandTotal" value="0"><input id="f_compTotal" value="0">
     </div>
   </div>
 
@@ -1078,8 +1012,6 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('f_submDate').value = new Date().toISOString().split('T')[0];
   updateWeekBadge();
   renderCoDropdown();
-  renderCoRows();
-  addDailyRow();
 });
 
 function updateWeekBadge() {
@@ -1456,303 +1388,286 @@ function formatPKR(v) {
 
 
 // ============================================================
-// FORM — CO ROWS
+// FORM — ENTRY CARDS
 // ============================================================
 function renderCoDropdown() {
-  document.getElementById('f_submittedBy').innerHTML = '<option value="">-- Select --</option>' +
+  const el = document.getElementById('f_submittedBy');
+  if (el) el.innerHTML = '<option value="">-- Select --</option>' +
     submitters.map(s=>`<option value="${s}">${s}</option>`).join('');
 }
 
-function addCoRow() {
+// kept for backward compat — no longer pre-fills the form
+function renderCoRows() {}
+function addDailyRow() {}
+function calcDailyTotals() {}
+function addChildRow() {}
+function addCompRow() {}
+function calcAnalysis() {}
+
+// ============================================================
+// ENTRY CARDS — new simplified system
+// ============================================================
+let entryCards = [];
+
+function addEntryCard() {
+  const dateVal = document.getElementById('f_weekEnding').value || new Date().toISOString().split('T')[0];
   const id = Date.now();
-  const div = document.createElement('div');
-  div.className = 'activity-row'; div.id = 'co_'+id;
-  div.innerHTML = `
-    <div class="activity-row-header">
-      <div class="activity-label">C/O Entry</div>
-      <button class="remove-btn" onclick="this.closest('.activity-row').remove();updateTotals()">Remove</button>
+  entryCards.push({ id });
+  const isWE = isWeekend(dateVal);
+  const p = isWE ? prices.we : prices.wd;
+  const rateLabel = isWE ? '🟡 Weekend Rate' : '🔵 Weekday Rate';
+
+  const card = document.createElement('div');
+  card.id = 'ec_'+id;
+  card.style.cssText = 'background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:12px;position:relative';
+  card.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;color:var(--white)">Entry #${entryCards.length}</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(0,0,0,0.05);color:var(--grey)">${rateLabel}</span>
+        <button onclick="removeEntryCard(${id})" style="background:transparent;border:1px solid rgba(192,57,43,0.3);color:#c0392b;font-size:11px;padding:3px 10px;border-radius:5px;cursor:pointer">Remove</button>
+      </div>
     </div>
-    <div class="form-grid">
-      <div class="form-group"><label>C/O Name</label>
-        <select class="co-select">
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <label style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Date *</label>
+        <input type="date" class="ec-date" value="${dateVal}" onchange="recalcCard(${id})" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid rgba(0,0,0,0.12);border-radius:6px;background:#fff;color:var(--white)">
+      </div>
+      <div>
+        <label style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Arrival Time</label>
+        <input type="time" class="ec-time" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid rgba(0,0,0,0.12);border-radius:6px;background:#fff;color:var(--white)">
+      </div>
+      <div>
+        <label style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Authorised By (C/O) *</label>
+        <select class="ec-co" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid rgba(0,0,0,0.12);border-radius:6px;background:#fff;color:var(--white)">
           ${coPersonnel.map(c=>`<option value="${c}">${c}</option>`).join('')}
         </select>
       </div>
-      <div class="form-group"><label>Entry Free</label><input type="number" class="co-ef" value="0" min="0"></div>
-      <div class="form-group"><label>Entry Comp</label><input type="number" class="co-ec" value="0" min="0"></div>
-      <div class="form-group"><label>Chairlift Free</label><input type="number" class="co-cf" value="0" min="0"></div>
-      <div class="form-group"><label>Chairlift Comp</label><input type="number" class="co-cc" value="0" min="0"></div>
-      <div class="form-group"><label>Zipline Free</label><input type="number" class="co-zf" value="0" min="0"></div>
-      <div class="form-group"><label>Zipline Comp</label><input type="number" class="co-zc" value="0" min="0"></div>
-      <div class="form-group"><label>Giant Swing Free</label><input type="number" class="co-gf" value="0" min="0"></div>
-      <div class="form-group"><label>Giant Swing Comp</label><input type="number" class="co-gc" value="0" min="0"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <label style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Particulars / Group Name</label>
+        <input type="text" class="ec-particulars" placeholder="e.g. Guests - (Local) Ali Khan" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid rgba(0,0,0,0.12);border-radius:6px;background:#fff;color:var(--white)">
+      </div>
+      <div>
+        <label style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Type</label>
+        <select class="ec-type" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid rgba(0,0,0,0.12);border-radius:6px;background:#fff;color:var(--white)">
+          <option value="Local">Local</option>
+          <option value="Police">Police</option>
+          <option value="Tour Operator">Tour Operator</option>
+          <option value="Forest Department">Forest Department</option>
+          <option value="Pak Army / PR">Pak Army / PR</option>
+          <option value="F&F">F&F Policy</option>
+          <option value="Child (Over Age)">Child — Over Age</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="background:rgba(0,0,0,0.03);border-radius:8px;padding:12px;margin-bottom:12px">
+      <div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Activity & Persons</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:10px;color:var(--grey);display:block;margin-bottom:3px">Activity *</label>
+          <select class="ec-activity" onchange="recalcCard(${id})" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid rgba(0,0,0,0.12);border-radius:6px;background:#fff;color:var(--white)">
+            <option value="entry">Entry Gate</option>
+            <option value="chair">Chairlift</option>
+            <option value="zip">Zipline</option>
+            <option value="gs">Giant Swing</option>
+            <option value="ss">Slingshot</option>
+            <option value="skiing">Skiing</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--grey);display:block;margin-bottom:3px">Number of Persons *</label>
+          <input type="number" class="ec-persons" value="1" min="1" onchange="recalcCard(${id})" style="width:100%;padding:8px 10px;font-size:13px;border:1px solid rgba(0,0,0,0.12);border-radius:6px;text-align:center;background:#fff;color:var(--white)">
+        </div>
+      </div>
+      <div id="ecprice_${id}" style="margin-top:8px;font-size:11px;color:var(--grey)"></div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div>
+        <label style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Free or Complimentary?</label>
+        <select class="ec-entrytype" style="padding:7px 12px;font-size:12px;border:1px solid rgba(0,0,0,0.12);border-radius:6px;background:#fff;color:var(--white)">
+          <option value="Free">Free — No ticket issued</option>
+          <option value="Complimentary">Complimentary — Policy / PR</option>
+        </select>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Revenue Impact</div>
+        <div class="ec-rev" id="ecrev_${id}" style="font-size:18px;font-weight:700;color:#c0392b">PKR 0</div>
+      </div>
     </div>`;
-  document.getElementById('coRows').appendChild(div);
+
+  document.getElementById('entryCards').appendChild(card);
+  updateRunningTotals();
 }
 
-function renderCoRows() {
-  coPersonnel.forEach(() => addCoRow());
-  // pre-set first to "Without permission"
+function removeEntryCard(id) {
+  const card = document.getElementById('ec_'+id);
+  if (card) card.remove();
+  entryCards = entryCards.filter(e => e.id !== id);
+  updateRunningTotals();
 }
 
-// ============================================================
-// DAILY ROWS
-// ============================================================
-function addDailyRow() {
-  const id = Date.now();
-  const d = new Date(); d.setDate(d.getDate() - document.querySelectorAll('#dailyRows tr').length);
-  const dateStr = d.toISOString().split('T')[0];
-  const tr = document.createElement('tr'); tr.id = 'dr_'+id;
-  tr.innerHTML = `
-    <td><input type="date" class="dr-date" value="${dateStr}" style="padding:5px 8px;font-size:12px;width:130px" onchange="calcDailyTotals()"></td>
-    <td style="white-space:nowrap">
-      <input type="time" class="dr-arrtime" style="padding:5px 8px;font-size:12px;width:95px" title="Arrival time — used for CCTV cross-reference">
-      <span class="dr-rate-badge" style="font-size:9px;font-weight:700;padding:2px 6px;border:1px solid rgba(0,0,0,0.15);border-radius:10px;margin-left:4px;vertical-align:middle;color:var(--grey)"></span>
-    </td>
-    <td><input type="number" class="dr-ef" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
-    <td><input type="number" class="dr-ec" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
-    <td><input type="number" class="dr-cf" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
-    <td><input type="number" class="dr-cc" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
-    <td><input type="number" class="dr-zf" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
-    <td><input type="number" class="dr-zc" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
-    <td><input type="number" class="dr-gf" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
-    <td><input type="number" class="dr-gc" value="0" min="0" style="width:60px;padding:5px;font-size:12px" onchange="calcDailyTotals()"></td>
-    <td id="dtf_${id}" style="color:var(--gold);font-weight:600">0</td>
-    <td id="dtc_${id}" style="color:var(--amber);font-weight:600">0</td>
-    <td><button class="remove-btn" onclick="this.closest('tr').remove();calcDailyTotals()">×</button></td>`;
-  document.getElementById('dailyRows').appendChild(tr);
-  calcDailyTotals();
+function recalcCard(id) {
+  const card = document.getElementById('ec_'+id);
+  if (!card) return;
+  const dateVal  = card.querySelector('.ec-date').value;
+  const activity = card.querySelector('.ec-activity').value;
+  const persons  = +card.querySelector('.ec-persons').value||0;
+  const p        = isWeekend(dateVal) ? prices.we : prices.wd;
+
+  // Price per person for the selected activity
+  const actPriceMap = { entry:p.entry, chair:p.chair, zip:p.zip, gs:p.gs, ss:p.ss, skiing:p.chair, other:0 };
+  const actLabelMap = { entry:'Entry Gate', chair:'Chairlift', zip:'Zipline', gs:'Giant Swing', ss:'Slingshot', skiing:'Skiing', other:'Other' };
+  const unitPrice = actPriceMap[activity] || 0;
+  const rev = persons * unitPrice;
+
+  const revEl = document.getElementById('ecrev_'+id);
+  if (revEl) revEl.textContent = 'PKR ' + rev.toLocaleString();
+
+  const priceEl = document.getElementById('ecprice_'+id);
+  if (priceEl && unitPrice > 0) {
+    const rateLabel = isWeekend(dateVal) ? '🟡 WE' : '🔵 WD';
+    priceEl.textContent = `${actLabelMap[activity]} — PKR ${unitPrice.toLocaleString()} per person ${rateLabel} · ${persons} persons = PKR ${rev.toLocaleString()}`;
+  } else if (priceEl) {
+    priceEl.textContent = activity === 'other' ? 'Select activity for price calculation' : '';
+  }
+
+  updateRunningTotals();
 }
 
-function calcDailyTotals() {
-  const rows = document.querySelectorAll('#dailyRows tr');
-  const totals = {ef:0,ec:0,cf:0,cc:0,zf:0,zc:0,gf:0,gc:0};
-  let totalRev = 0;
+function updateRunningTotals() {
+  const cards = document.querySelectorAll('#entryCards [id^="ec_"]');
+  let freeTotal=0, compTotal=0, revTotal=0;
 
-  rows.forEach(tr => {
-    const dateVal = tr.querySelector('.dr-date')?.value || '';
-    const ef = +tr.querySelector('.dr-ef').value||0;
-    const ec = +tr.querySelector('.dr-ec').value||0;
-    const cf = +tr.querySelector('.dr-cf').value||0;
-    const cc = +tr.querySelector('.dr-cc').value||0;
-    const zf = +tr.querySelector('.dr-zf').value||0;
-    const zc = +tr.querySelector('.dr-zc').value||0;
-    const gf = +tr.querySelector('.dr-gf').value||0;
-    const gc = +tr.querySelector('.dr-gc').value||0;
-
-    // Per-date WD/WE pricing
-    const ep = getPriceForDate('entry', dateVal);
-    const cp = getPriceForDate('chair', dateVal);
-    const zp = getPriceForDate('zip',   dateVal);
-    const gp = getPriceForDate('gs',    dateVal);
-    const rowRev = (ef+ec)*ep + (cf+cc)*cp + (zf+zc)*zp + (gf+gc)*gp;
-    totalRev += rowRev;
-
-    // Show WD/WE rate badge on each row
-    const id = tr.id.replace('dr_','');
-    const tfEl = document.getElementById('dtf_'+id);
-    const tcEl = document.getElementById('dtc_'+id);
-    if(tfEl) tfEl.textContent = ef+cf+zf+gf;
-    if(tcEl) tcEl.textContent = ec+cc+zc+gc;
-
-    // Show rate type badge in arrival time cell
-    const rateBadge = tr.querySelector('.dr-rate-badge');
-    if (rateBadge && dateVal) {
-      const isWE = isWeekend(dateVal);
-      rateBadge.textContent = isWE ? 'WE' : 'WD';
-      rateBadge.style.color = isWE ? 'var(--gold)' : '#1a5276';
-      rateBadge.style.borderColor = isWE ? 'rgba(184,146,46,0.4)' : 'rgba(26,82,118,0.3)';
-    }
-
-    totals.ef+=ef; totals.ec+=ec; totals.cf+=cf; totals.cc+=cc;
-    totals.zf+=zf; totals.zc+=zc; totals.gf+=gf; totals.gc+=gc;
+  cards.forEach(card => {
+    const dateVal  = card.querySelector('.ec-date')?.value || '';
+    const activity = card.querySelector('.ec-activity')?.value || 'entry';
+    const persons  = +card.querySelector('.ec-persons')?.value||0;
+    const type     = card.querySelector('.ec-entrytype')?.value;
+    const p        = isWeekend(dateVal) ? prices.we : prices.wd;
+    const actPriceMap = { entry:p.entry, chair:p.chair, zip:p.zip, gs:p.gs, ss:p.ss, skiing:p.chair, other:0 };
+    const rev = persons * (actPriceMap[activity]||0);
+    if (type === 'Complimentary') compTotal += persons;
+    else freeTotal += persons;
+    revTotal += rev;
   });
 
-  ['ef','ec','cf','cc','zf','zc','gf','gc'].forEach(k => {
-    const el = document.getElementById('tot_'+k);
-    if(el) el.textContent = totals[k];
-  });
-  const tf = totals.ef+totals.cf+totals.zf+totals.gf;
-  const tc = totals.ec+totals.cc+totals.zc+totals.gc;
-  document.getElementById('tot_tf').textContent = tf;
-  document.getElementById('tot_tc').textContent = tc;
+  const count = cards.length;
+  document.getElementById('entryCount').textContent = count + (count===1?' entry':' entries');
+  const rt = document.getElementById('runningTotals');
+  if (rt) rt.style.display = count > 0 ? 'block' : 'none';
+  const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  set('rt_freeTotal',  freeTotal.toLocaleString());
+  set('rt_compTotal',  compTotal.toLocaleString());
+  set('rt_revTotal',   'PKR ' + revTotal.toLocaleString());
+  set('rt_entryCount', count.toLocaleString());
 
-  // Distribute rev estimate across form fields
-  // Use blended: calculate per-activity using average of WD/WE (simplified for totals row)
-  const avgEntry = (prices.wd.entry + prices.we.entry) / 2;
-  const avgChair = (prices.wd.chair + prices.we.chair) / 2;
-  const avgZip   = (prices.wd.zip   + prices.we.zip)   / 2;
-  const avgGs    = (prices.wd.gs    + prices.we.gs)     / 2;
-
-  const revEntry = Math.round((totals.ef+totals.ec)*avgEntry);
-  const revChair = Math.round((totals.cf+totals.cc)*avgChair);
-  const revZip   = Math.round((totals.zf+totals.zc)*avgZip);
-  const revGs    = Math.round((totals.gf+totals.gc)*avgGs);
-
-  document.getElementById('f_entryRev').value = revEntry;
-  document.getElementById('f_chairRev').value = revChair;
-  document.getElementById('f_zipRev').value   = revZip;
-  document.getElementById('f_gsRev').value    = revGs;
-  document.getElementById('f_grandTotal').value = revEntry+revChair+revZip+revGs;
-}
-
-// ============================================================
-// CHILD ROWS
-// ============================================================
-function addChildRow() {
-  const id = Date.now();
-  const div = document.createElement('div'); div.className='activity-row'; div.id='child_'+id;
-  const today = new Date().toISOString().split('T')[0];
-  div.innerHTML = `
-    <div class="activity-row-header">
-      <div class="activity-label">Over-Age Child Case</div>
-      <button class="remove-btn" onclick="this.closest('.activity-row').remove()">Remove</button>
-    </div>
-    <div class="form-grid">
-      <div class="form-group"><label>Date</label><input type="date" value="${today}"></div>
-      <div class="form-group"><label>Particulars</label><input type="text" placeholder="Guests - (Child)"></div>
-      <div class="form-group"><label>Facilitated At</label><select><option>Chairlift</option><option>Entry</option><option>Zipline</option><option>Giant Swing</option></select></div>
-      <div class="form-group"><label>No. of Children</label><input type="number" value="1" min="1"></div>
-      <div class="form-group full"><label>Free Entry Facilitated By</label><input type="text" placeholder="e.g. Sale Department & Chairlift Office"></div>
-    </div>`;
-  document.getElementById('childRows').appendChild(div);
-}
-
-// ============================================================
-// COMP ROWS
-// ============================================================
-function addCompRow() {
-  const id = Date.now();
-  const div = document.createElement('div'); div.className='activity-row'; div.id='comp_'+id;
-  const today = new Date().toISOString().split('T')[0];
-  div.innerHTML = `
-    <div class="activity-row-header">
-      <div class="activity-label">Complimentary Entry</div>
-      <button class="remove-btn" onclick="this.closest('.activity-row').remove()">Remove</button>
-    </div>
-    <div class="form-grid">
-      <div class="form-group"><label>Date</label><input type="date" value="${today}"></div>
-      <div class="form-group"><label>Activity</label><select><option>Chairlift</option><option>Entry</option><option>Zipline</option><option>Giant Swing</option><option>Slingshot</option></select></div>
-      <div class="form-group"><label>Particulars / Group</label><input type="text" placeholder="e.g. Guests - (Pak Army)"></div>
-      <div class="form-group"><label>C/O Authorised By</label><select>${coPersonnel.map(c=>`<option>${c}</option>`).join('')}</select></div>
-      <div class="form-group"><label>No. Paid</label><input type="number" value="0" min="0"></div>
-      <div class="form-group"><label>No. Complimentary</label><input type="number" value="1" min="0"></div>
-      <div class="form-group"><label>Ticket Amount (PKR)</label><input type="number" value="2800"></div>
-      <div class="form-group"><label>Notes / Policy</label><input type="text" placeholder="e.g. Company's policy, PR tickets"></div>
-    </div>`;
-  document.getElementById('compRows').appendChild(div);
-}
-
-// ============================================================
-// ANALYSIS CALC
-// ============================================================
-function calcAnalysis() {
-  const vals = ['f_local','f_police','f_tourOp','f_forestDept','f_otherFree'].map(id=>+document.getElementById(id).value||0);
-  document.getElementById('f_totalFree').value = vals.reduce((a,b)=>a+b,0);
+  // Update hidden financial fields for submitReport
+  const setVal = (id, v) => { const el = document.getElementById(id); if(el) el.value = v; };
+  setVal('f_totalFree',  freeTotal);
+  setVal('f_compTotal',  compTotal);
+  setVal('f_grandTotal', revTotal);
 }
 
 // ============================================================
 // SUBMIT
 // ============================================================
 async function submitReport() {
-  const weekEnding = document.getElementById('f_weekEnding').value;
-  const weekNum = document.getElementById('f_weekNum').value;
+  const weekEnding  = document.getElementById('f_weekEnding').value;
+  const weekNum     = document.getElementById('f_weekNum').value;
   const submittedBy = document.getElementById('f_submittedBy').value;
-  if (!weekEnding || !weekNum || !submittedBy) { toast('Please complete all required fields.','error'); return; }
+  if (!weekEnding || !submittedBy) { toast('Please select a date and submitter','error'); return; }
 
-  // Collect CO rows
+  const cards = document.querySelectorAll('#entryCards [id^="ec_"]');
+  if (!cards.length) { toast('Please add at least one entry','error'); return; }
+
+  // Build coData and dailyData from entry cards
   const coData = [];
-  document.querySelectorAll('#coRows .activity-row').forEach(row => {
-    const co = { name: row.querySelector('.co-select').value,
-      ef:+row.querySelector('.co-ef').value||0, ec:+row.querySelector('.co-ec').value||0,
-      cf:+row.querySelector('.co-cf').value||0, cc:+row.querySelector('.co-cc').value||0,
-      zf:+row.querySelector('.co-zf').value||0, zc:+row.querySelector('.co-zc').value||0,
-      gf:+row.querySelector('.co-gf').value||0, gc:+row.querySelector('.co-gc').value||0,
-    };
-    co.total = (co.ef+co.ec)*prices.entry + (co.cf+co.cc)*prices.chair + (co.zf+co.zc)*prices.zip + (co.gf+co.gc)*prices.gs;
-    coData.push(co);
-  });
-
-  // Collect daily rows
   const dailyData = [];
-  document.querySelectorAll('#dailyRows tr').forEach(tr => {
-    dailyData.push({
-      date: tr.querySelector('.dr-date').value,
-      arrivalTime: tr.querySelector('.dr-arrtime').value,
-      ef:+tr.querySelector('.dr-ef').value||0, ec:+tr.querySelector('.dr-ec').value||0,
-      cf:+tr.querySelector('.dr-cf').value||0, cc:+tr.querySelector('.dr-cc').value||0,
-      zf:+tr.querySelector('.dr-zf').value||0, zc:+tr.querySelector('.dr-zc').value||0,
-      gf:+tr.querySelector('.dr-gf').value||0, gc:+tr.querySelector('.dr-gc').value||0,
+  const compData = [];
+
+  cards.forEach(card => {
+    const dateVal    = card.querySelector('.ec-date')?.value || weekEnding;
+    const time       = card.querySelector('.ec-time')?.value || '';
+    const co         = card.querySelector('.ec-co')?.value || '';
+    const particulars= card.querySelector('.ec-particulars')?.value || '';
+    const visitorType= card.querySelector('.ec-type')?.value || '';
+    const entryType  = card.querySelector('.ec-entrytype')?.value || 'Free';
+    const activity   = card.querySelector('.ec-activity')?.value || 'entry';
+    const persons    = +card.querySelector('.ec-persons')?.value||0;
+    const p          = isWeekend(dateVal) ? prices.we : prices.wd;
+    const actPriceMap = { entry:p.entry, chair:p.chair, zip:p.zip, gs:p.gs, ss:p.ss, skiing:p.chair, other:0 };
+    const rev        = persons * (actPriceMap[activity]||0);
+    const isComp     = entryType === 'Complimentary';
+
+    // Map activity to the correct column
+    const ef = (!isComp && activity==='entry')  ? persons : 0;
+    const ec = (isComp  && activity==='entry')  ? persons : 0;
+    const cf = (!isComp && (activity==='chair'||activity==='skiing')) ? persons : 0;
+    const cc = (isComp  && (activity==='chair'||activity==='skiing')) ? persons : 0;
+    const zf = (!isComp && activity==='zip')    ? persons : 0;
+    const zc = (isComp  && activity==='zip')    ? persons : 0;
+    const gf = (!isComp && activity==='gs')     ? persons : 0;
+    const gc = (isComp  && activity==='gs')     ? persons : 0;
+
+    coData.push({ name:co, particulars, type:visitorType, activity, ef, ec, cf, cc, zf, zc, gf, gc, total:rev });
+    dailyData.push({ date:dateVal, arrivalTime:time, ef, ec, cf, cc, zf, zc, gf, gc });
+
+    if (isComp) compData.push({
+      date:dateVal, activity, particulars,
+      authorisedBy:co, paid:0, comp:persons, amount:rev, notes:visitorType
     });
   });
 
-  // Collect child rows
-  const childData = [];
-  document.querySelectorAll('#childRows .activity-row').forEach(row => {
-    const inputs = row.querySelectorAll('input,select');
-    childData.push({ date:inputs[0].value, particulars:inputs[1].value, facility:inputs[2].value, count:inputs[3].value, by:inputs[4].value });
-  });
-
-  // Collect comp rows
-  const compData = [];
-  document.querySelectorAll('#compRows .activity-row').forEach(row => {
-    const inputs = row.querySelectorAll('input,select');
-    compData.push({ date:inputs[0].value, activity:inputs[1].value, particulars:inputs[2].value, authorisedBy:inputs[3].value, paid:inputs[4].value, comp:inputs[5].value, amount:inputs[6].value, notes:inputs[7].value });
-  });
+  // Calculate totals
+  const totalFree = coData.reduce((a,r)=>a+r.ef+r.cf+r.zf+r.gf, 0);
+  const totalComp = coData.reduce((a,r)=>a+r.ec+r.cc+r.zc+r.gc, 0);
+  const grand     = coData.reduce((a,r)=>a+r.total, 0);
 
   const payload = {
     action: 'submitAuditReport',
-    weekEnding, weekNum, submittedBy,
+    weekEnding, weekNum: weekNum || ('WE '+getISOWeek(new Date(weekEnding))),
+    submittedBy,
     submDate: document.getElementById('f_submDate').value,
-    freeAnalysis: { local:+document.getElementById('f_local').value, police:+document.getElementById('f_police').value,
-      tourOp:+document.getElementById('f_tourOp').value, forestDept:+document.getElementById('f_forestDept').value,
-      other:+document.getElementById('f_otherFree').value, total:+document.getElementById('f_totalFree').value },
-    coData, dailyData, childData, compData,
+    freeAnalysis: { total: totalFree },
+    coData, dailyData, compData,
     observations: document.getElementById('f_observations').value,
-    financials: {
-      entry:+document.getElementById('f_entryRev').value, chair:+document.getElementById('f_chairRev').value,
-      zip:+document.getElementById('f_zipRev').value, gs:+document.getElementById('f_gsRev').value,
-      grand:+document.getElementById('f_grandTotal').value, comp:+document.getElementById('f_compTotal').value
-    },
+    financials: { entry:0, chair:0, zip:0, gs:0, grand, comp: totalComp },
     timestamp: new Date().toISOString()
   };
 
   const result = await gasCall(payload);
   if (result.status === 'demo') {
-    toast('Demo mode: Report captured locally (GAS not connected)','info');
+    toast('Captured locally — GAS not connected','info');
   } else if (result.status === 'success') {
-    toast('Audit report submitted successfully!','success');
+    toast('Submitted successfully — Audit team notified','success');
     clearForm();
     loadLog();
   } else {
-    toast('Submission error: ' + (result.message||'Unknown error'),'error');
+    toast('Error: '+(result.message||'Unknown'),'error');
   }
 }
 
 function clearForm() {
-  document.getElementById('f_weekEnding').value='';
-  document.getElementById('f_weekNum').value='';
-  document.getElementById('f_submittedBy').value='';
-  document.getElementById('f_local').value=0;
-  document.getElementById('f_police').value=0;
-  document.getElementById('f_tourOp').value=0;
-  document.getElementById('f_forestDept').value=0;
-  document.getElementById('f_otherFree').value=0;
-  document.getElementById('f_totalFree').value=0;
-  document.getElementById('f_observations').value='';
-  document.getElementById('f_entryRev').value=0;
-  document.getElementById('f_chairRev').value=0;
-  document.getElementById('f_zipRev').value=0;
-  document.getElementById('f_gsRev').value=0;
-  document.getElementById('f_grandTotal').value=0;
-  document.getElementById('f_compTotal').value=0;
-  document.getElementById('coRows').innerHTML='';
-  document.getElementById('dailyRows').innerHTML='';
-  document.getElementById('childRows').innerHTML='';
-  document.getElementById('compRows').innerHTML='';
-  addDailyRow();
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };
+  set('f_weekEnding',''); set('f_weekNum',''); set('f_submittedBy','');
+  set('f_observations',''); set('f_grandTotal',0); set('f_totalFree',0); set('f_compTotal',0);
+  document.getElementById('entryCards').innerHTML = '';
+  document.getElementById('f_rateIndicator').style.display = 'none';
+  const rt = document.getElementById('runningTotals');
+  if (rt) rt.style.display = 'none';
+  document.getElementById('entryCount').textContent = '0 entries';
+  entryCards = [];
   toast('Form cleared','info');
 }
+
 
 // ============================================================
 // SUBMISSION LOG
