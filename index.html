@@ -392,9 +392,9 @@
     border:1px solid var(--border); color:var(--grey); background:transparent;
     cursor:pointer; transition:all 0.15s;
   }
-  .chip:hover, .chip.active { border-color:var(--gold); color:var(--gold-light); background:rgba(201,148,58,0.1); }
+  .chip:hover, .chip.active { border-color:var(--gold); color:var(--gold-light); background:rgba(201,148,46,0.1); }
 
-
+  @media(max-width:900px) {
     .grid-4,.grid-3 { grid-template-columns:repeat(2,1fr); }
     .form-grid { grid-template-columns:1fr; }
     .main { padding:16px; }
@@ -402,12 +402,58 @@
   @media(max-width:600px) {
     .grid-4,.grid-3,.grid-2 { grid-template-columns:1fr; }
   }
+
+  /* ============================================================
+     PRINT STYLES
+  ============================================================ */
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { background: #fff !important; color: #1a1a18 !important; font-family: Arial, sans-serif !important; font-size: 11pt; }
+    .header, .nav-tabs, .toast-container, .modal-overlay, #pinModal,
+    .btn, .chip-bar, .filter-bar, .obs-action-form, .remove-btn,
+    .pagination { display: none !important; }
+    .main { padding: 0 !important; max-width: 100% !important; }
+    .panel { display: block !important; }
+    #panel-dashboard, #panel-submit, #panel-validate,
+    #panel-log, #panel-reports, #panel-config { display: none !important; }
+    #panel-observations { display: block !important; }
+    .card { border: 1px solid #ccc !important; border-radius: 4px !important;
+            padding: 12px !important; margin-bottom: 12px !important;
+            box-shadow: none !important; background: #fff !important; break-inside: avoid; }
+    .obs-pipeline { display: none !important; }
+    .card-title { color: #b8922e !important; font-size: 12pt !important; border-bottom: 1px solid #b8922e !important; padding-bottom: 6px !important; margin-bottom: 10px !important; }
+    thead th { background: #2c2c2c !important; color: #fff !important; font-size: 9pt !important; padding: 6px 8px !important; }
+    tbody td { font-size: 9pt !important; padding: 5px 8px !important; border-bottom: 1px solid #eee !important; }
+    tfoot td { background: #f5f3ee !important; font-weight: bold !important; font-size: 9pt !important; }
+    .obs-status-badge { border: 1px solid #999 !important; font-size: 8pt !important; }
+    .stat-badge { border: 1px solid #999 !important; font-size: 8pt !important; }
+    table { width: 100% !important; border-collapse: collapse !important; page-break-inside: auto; }
+    tr { page-break-inside: avoid; page-break-after: auto; }
+    .obs-detail-row { display: none !important; }
+    #print-header { display: block !important; }
+  }
+  #print-header { display: none; }
 </style>
 </head>
 <body>
 
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- PRINT HEADER — only visible when printing -->
+<div id="print-header" style="padding:0 0 16px;border-bottom:2px solid #b8922e;margin-bottom:20px">
+  <div style="display:flex;align-items:center;justify-content:space-between">
+    <div>
+      <div style="font-size:18pt;font-weight:700;color:#b8922e;font-family:Arial,sans-serif">MJSR Audit Portal</div>
+      <div style="font-size:11pt;color:#444;margin-top:2px">Malam Jabba Ski Resort — Samsons Group of Companies</div>
+    </div>
+    <div style="text-align:right;font-size:10pt;color:#666">
+      <div id="print-title" style="font-weight:700;font-size:13pt;color:#1a1a18"></div>
+      <div id="print-meta" style="margin-top:3px"></div>
+      <div style="margin-top:2px">Printed: <span id="print-date"></span></div>
+    </div>
+  </div>
+</div>
 
 <!-- PIN MODAL -->
 <div class="modal-overlay" id="pinModal">
@@ -841,14 +887,18 @@
     <div class="card" style="margin-bottom:16px">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">
         <div class="card-title" style="margin-bottom:0"><div class="dot"></div>Audit Observations Tracker</div>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="btn btn-outline btn-sm" onclick="loadObservations()">↻ Refresh</button>
+          <button class="btn btn-outline btn-sm" onclick="printObservations()" style="display:flex;align-items:center;gap:5px">🖨 Print Report</button>
           <button class="btn btn-gold btn-sm" onclick="toggleNewObsForm()">+ Add Observation</button>
         </div>
       </div>
 
       <div class="filter-bar">
-        <input type="text" id="obsSearch" placeholder="Search observations..." oninput="filterObs()" style="max-width:240px">
+        <input type="text" id="obsSearch" placeholder="Search observations..." oninput="filterObs()" style="max-width:200px">
+        <select id="obsMonthFilter" onchange="filterObs()">
+          <option value="">All Months</option>
+        </select>
         <select id="obsStatusFilter" onchange="filterObs()">
           <option value="">All Statuses</option>
           <option value="Open">Outstanding</option>
@@ -2154,7 +2204,24 @@ function buildObsFilters() {
   const rsel = document.getElementById('obsReportFilter');
   rsel.innerHTML = '<option value="">All Reports</option>' + refs.map(r=>`<option value="${r}">${r}</option>`).join('');
 
-  // Dept chips (top 8)
+  // Month dropdown — derived from observation dates
+  const monthSet = new Set();
+  allObs.forEach(r => {
+    if (!r.date) return;
+    const d = new Date(r.date);
+    if (isNaN(d)) return;
+    monthSet.add(d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0'));
+  });
+  const months = [...monthSet].sort((a,b)=>b.localeCompare(a));
+  const msel = document.getElementById('obsMonthFilter');
+  msel.innerHTML = '<option value="">All Months</option>' +
+    months.map(m => {
+      const [y, mo] = m.split('-');
+      const label = new Date(+y, +mo-1, 1).toLocaleDateString('en-PK', { month:'long', year:'numeric' });
+      return `<option value="${m}">${label}</option>`;
+    }).join('');
+
+  // Dept chips (top 10)
   const topDepts = depts.slice(0,10);
   document.getElementById('deptChips').innerHTML =
     '<button class="chip active" onclick="setDeptChip(this,\'\')">All</button>' +
@@ -2180,19 +2247,133 @@ function filterObs() {
   const status = document.getElementById('obsStatusFilter').value;
   const dept   = document.getElementById('obsDeptFilter').value;
   const ref    = document.getElementById('obsReportFilter').value;
+  const month  = document.getElementById('obsMonthFilter').value;
 
   filteredObs = allObs.filter(r => {
     const code = obsStatusCode(r);
     const txt  = (r.task+' '+r.dept+' '+r.ref+' '+(r.resortComment||'')+' '+(r.auditComment||'')).toLowerCase();
+
+    // Month filter
+    let monthMatch = true;
+    if (month && r.date) {
+      const d = new Date(r.date);
+      if (!isNaN(d)) {
+        const rMonth = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+        monthMatch = rMonth === month;
+      }
+    }
+
     return (!search || txt.includes(search)) &&
            (!status || code === status) &&
            (!dept   || r.dept === dept) &&
-           (!ref    || r.ref === ref);
+           (!ref    || r.ref === ref) &&
+           monthMatch;
   });
   obsPage = 1;
   renderObs();
   updateObsKPIs();
 }
+
+// ============================================================
+// PRINT OBSERVATIONS
+// ============================================================
+function printObservations() {
+  const month  = document.getElementById('obsMonthFilter').value;
+  const status = document.getElementById('obsStatusFilter').value;
+  const dept   = document.getElementById('obsDeptFilter').value;
+
+  // Build print title
+  let titleParts = ['Audit Observations Report'];
+  if (month) {
+    const [y, mo] = month.split('-');
+    titleParts = [new Date(+y, +mo-1, 1).toLocaleDateString('en-PK', { month:'long', year:'numeric' }) + ' — Observations Report'];
+  }
+  if (dept) titleParts.push(dept);
+  if (status) titleParts.push(status);
+
+  // Build meta line
+  const total = filteredObs.length;
+  const open  = filteredObs.filter(r=>obsStatusCode(r)==='Open').length;
+  const ver   = filteredObs.filter(r=>obsStatusCode(r)==='Verified').length;
+  const meta  = `${total} observations  |  ${open} outstanding  |  ${ver} verified`;
+
+  // Set print header content
+  document.getElementById('print-title').textContent = titleParts.join(' — ');
+  document.getElementById('print-meta').textContent  = meta;
+  document.getElementById('print-date').textContent  = new Date().toLocaleDateString('en-PK', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+  // Temporarily render ALL filtered observations (remove pagination for print)
+  const savedPage = obsPage;
+  const savedObs  = filteredObs;
+
+  // Build a full print table in a hidden div
+  let printTable = `
+    <div id="obs-print-table" style="margin-top:16px">
+      <table style="width:100%;border-collapse:collapse;font-size:9pt">
+        <thead>
+          <tr>
+            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:40px">S/N</th>
+            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:120px">Report</th>
+            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:130px">Department</th>
+            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left">Observation</th>
+            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:80px">Date</th>
+            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:65px">Priority</th>
+            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:90px">Status</th>
+            <th style="background:#2c2c2c;color:#fff;padding:7px 8px;text-align:left;width:65px">Verified</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${filteredObs.map((r,i) => {
+            const code = obsStatusCode(r);
+            const rowBg = i%2===0 ? '#ffffff' : '#f9f7f4';
+            const statusColor = code==='Open'?'#c0392b':code==='Actioned'?'#d35400':code==='Verified'?'#1e8449':'#1a5276';
+            return `<tr style="background:${rowBg}">
+              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-weight:600">${r.sn}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8pt;color:#555">${r.ref||'—'}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8.5pt">${r.dept||'—'}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8.5pt;line-height:1.4">${r.task||'—'}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8pt;color:#555">${r.date||'—'}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8pt;font-weight:600;color:${r.priority==='High'?'#c0392b':r.priority==='Low'?'#1e8449':'#d35400'}">${r.priority||'—'}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8pt;font-weight:600;color:${statusColor}">${code}</td>
+              <td style="padding:6px 8px;border-bottom:1px solid #eee;font-size:8pt;font-weight:600;color:${r.auditVerified?'#1e8449':'#999'}">${r.auditVerified||'Pending'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+        <tfoot>
+          <tr style="background:#f5f3ee">
+            <td colspan="3" style="padding:8px;font-weight:700;font-size:9pt;border-top:2px solid #b8922e">TOTAL: ${filteredObs.length} observations</td>
+            <td colspan="2" style="padding:8px;font-size:9pt;border-top:2px solid #b8922e">${open} outstanding</td>
+            <td colspan="3" style="padding:8px;font-size:9pt;border-top:2px solid #b8922e;font-weight:700;color:#1e8449">${ver} verified complete</td>
+          </tr>
+        </tfoot>
+      </table>
+      ${filteredObs.some(r=>r.resortComment||r.auditComment) ? `
+      <div style="margin-top:20px;page-break-before:always">
+        <div style="font-size:12pt;font-weight:700;color:#b8922e;border-bottom:1px solid #b8922e;padding-bottom:6px;margin-bottom:12px">Detailed Comments</div>
+        ${filteredObs.filter(r=>r.resortComment||r.auditComment).map(r=>`
+          <div style="margin-bottom:10px;padding:8px 10px;border:1px solid #ddd;border-radius:4px;break-inside:avoid">
+            <div style="font-weight:700;font-size:9pt;margin-bottom:4px">#${r.sn} — ${r.dept}</div>
+            <div style="font-size:8.5pt;color:#333;margin-bottom:4px;line-height:1.4">${r.task}</div>
+            ${r.resortComment ? `<div style="font-size:8pt;margin-top:4px"><strong>Resort:</strong> ${r.resortComment}</div>` : ''}
+            ${r.auditComment  ? `<div style="font-size:8pt;margin-top:2px"><strong>Audit:</strong> ${r.auditComment}</div>` : ''}
+          </div>`).join('')}
+      </div>` : ''}
+    </div>`;
+
+  // Inject into observations panel for print
+  const existing = document.getElementById('obs-print-table');
+  if (existing) existing.remove();
+  document.querySelector('#panel-observations .card').insertAdjacentHTML('beforeend', printTable);
+
+  window.print();
+
+  // Clean up after print
+  setTimeout(() => {
+    const tbl = document.getElementById('obs-print-table');
+    if (tbl) tbl.remove();
+  }, 1000);
+}
+
 
 function updateObsKPIs() {
   const total  = allObs.length;
