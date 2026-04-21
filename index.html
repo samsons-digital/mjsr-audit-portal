@@ -8,21 +8,21 @@
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
 
   :root {
-    --navy: #0d1b2a;
-    --navy-mid: #162035;
-    --navy-light: #1e2d45;
-    --gold: #c9943a;
-    --gold-light: #e8b85a;
+    --navy: #f5f3ee;
+    --navy-mid: #eceae4;
+    --navy-light: #e2dfd8;
+    --gold: #b8922e;
+    --gold-light: #c9a040;
     --gold-pale: #f5e4c0;
-    --white: #f8f6f1;
-    --grey: #8a9ab0;
-    --grey-light: #c4cdd8;
+    --white: #1a1a18;
+    --grey: #6b6b60;
+    --grey-light: #4a4a42;
     --red: #c0392b;
-    --green: #27ae60;
-    --amber: #e67e22;
-    --blue-accent: #3b82f6;
-    --border: rgba(201,148,58,0.18);
-    --card: rgba(22,32,53,0.95);
+    --green: #1e8449;
+    --amber: #d35400;
+    --blue-accent: #1a5276;
+    --border: rgba(184,146,46,0.22);
+    --card: #ffffff;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -36,11 +36,11 @@
 
   /* HEADER */
   .header {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, rgba(201,148,58,0.08) 100%);
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, rgba(184,146,46,0.06) 100%);
     border-bottom: 1px solid var(--border);
     padding: 0 32px;
     position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 24px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 24px rgba(0,0,0,0.08);
   }
   .header-inner {
     max-width: 1400px; margin: 0 auto;
@@ -146,7 +146,7 @@
   .bar-chart { margin-top:8px; }
   .bar-row { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
   .bar-label { font-size:12px; color:var(--grey-light); width:170px; flex-shrink:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .bar-track { flex:1; height:10px; background:rgba(255,255,255,0.06); border-radius:5px; overflow:hidden; }
+  .bar-track { flex:1; height:10px; background:rgba(0,0,0,0.07); border-radius:5px; overflow:hidden; }
   .bar-fill { height:100%; border-radius:5px; transition:width 0.6s ease; }
   .bar-fill.red { background: linear-gradient(90deg, #c0392b, #e74c3c); }
   .bar-fill.gold { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
@@ -166,8 +166,8 @@
     padding: 10px 14px; text-align:left;
     border-bottom: 1px solid var(--border);
   }
-  tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition:background 0.15s; }
-  tbody tr:hover { background: rgba(201,148,58,0.04); }
+  tbody tr { border-bottom: 1px solid rgba(0,0,0,0.06); transition:background 0.15s; }
+  tbody tr:hover { background: rgba(184,146,46,0.05); }
   tbody td { padding: 10px 14px; color: var(--grey-light); font-size:12px; }
   tbody td.bold { font-weight:600; color:var(--white); }
   tfoot td {
@@ -184,8 +184,8 @@
   .form-group.full { grid-column:1/-1; }
   label { font-size:12px; color:var(--grey); font-weight:500; text-transform:uppercase; letter-spacing:0.05em; }
   input, select, textarea {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.12);
     border-radius: 8px;
     color: var(--white);
     font-family:'DM Sans',sans-serif; font-size:14px;
@@ -195,9 +195,9 @@
   }
   input:focus, select:focus, textarea:focus {
     border-color: var(--gold);
-    background: rgba(201,148,58,0.06);
+    background: rgba(184,146,46,0.06);
   }
-  select option { background: var(--navy-mid); color: var(--white); }
+  select option { background: #ffffff; color: var(--white); }
   textarea { resize:vertical; min-height:80px; }
 
   .section-divider {
@@ -209,7 +209,7 @@
 
   /* ACTIVITY ROW */
   .activity-row {
-    background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07);
+    background: rgba(0,0,0,0.02); border:1px solid rgba(0,0,0,0.08);
     border-radius: 10px; padding:16px; margin-bottom:12px;
   }
   .activity-row-header {
@@ -255,25 +255,25 @@
   /* TOAST */
   .toast-container { position:fixed; top:80px; right:24px; z-index:999; display:flex; flex-direction:column; gap:8px; }
   .toast {
-    background:var(--card); border:1px solid var(--border);
+    background:#ffffff; border:1px solid var(--border);
     border-radius:10px; padding:14px 20px;
     display:flex; align-items:center; gap:12px;
     font-size:13px; min-width:280px;
     animation: slideIn 0.3s ease;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
   }
-  .toast.success { border-color:rgba(39,174,96,0.4); }
+  .toast.success { border-color:rgba(30,132,73,0.4); }
   .toast.error { border-color:rgba(192,57,43,0.4); }
   .toast-icon { font-size:18px; }
   @keyframes slideIn { from { transform:translateX(40px); opacity:0; } to { transform:translateX(0); opacity:1; } }
 
   /* PIN MODAL */
   .modal-overlay {
-    position:fixed; inset:0; background:rgba(13,27,42,0.92);
+    position:fixed; inset:0; background:rgba(245,243,238,0.92);
     z-index:200; display:flex; align-items:center; justify-content:center;
   }
   .modal {
-    background:var(--navy-mid); border:1px solid var(--border);
+    background:#ffffff; border:1px solid var(--border);
     border-radius:16px; padding:40px; width:360px; text-align:center;
   }
   .modal h3 { font-family:'Syne',sans-serif; font-weight:700; font-size:20px; margin-bottom:8px; }
@@ -301,11 +301,11 @@
   /* PAGINATION */
   .pagination { display:flex; align-items:center; gap:8px; margin-top:16px; justify-content:flex-end; }
   .page-btn {
-    background:rgba(255,255,255,0.05); border:1px solid var(--border);
-    color:var(--grey-light); font-size:12px; padding:5px 12px;
+    background:rgba(0,0,0,0.04); border:1px solid var(--border);
+    color:var(--grey); font-size:12px; padding:5px 12px;
     border-radius:6px; cursor:pointer; transition:all 0.2s;
   }
-  .page-btn:hover, .page-btn.active { border-color:var(--gold); color:var(--gold-light); background:rgba(201,148,58,0.08); }
+  .page-btn:hover, .page-btn.active { border-color:var(--gold); color:var(--gold); background:rgba(184,146,46,0.08); }
   .page-info { font-size:12px; color:var(--grey); font-family:'DM Mono',monospace; }
 
   /* WEEK SELECTOR */
@@ -349,7 +349,7 @@
   .obs-pipeline { display:flex; gap:0; margin-bottom:28px; }
   .obs-stage {
     flex:1; padding:16px 20px; text-align:center;
-    background:var(--card); border:1px solid var(--border);
+    background:#ffffff; border:1px solid var(--border);
     position:relative;
   }
   .obs-stage:first-child { border-radius:10px 0 0 10px; }
@@ -371,7 +371,7 @@
   .obs-expand-row:hover td { background:rgba(201,148,58,0.06) !important; }
   .obs-detail-row td { padding:0 !important; }
   .obs-detail-inner {
-    background:rgba(13,27,42,0.8); border-top:1px solid var(--border);
+    background:rgba(0,0,0,0.03); border-top:1px solid var(--border);
     padding:16px 20px; font-size:12px; color:var(--grey-light);
     display:grid; grid-template-columns:1fr 1fr; gap:12px;
   }
@@ -380,7 +380,7 @@
   .obs-detail-block.full { grid-column:1/-1; }
 
   .obs-action-form {
-    background:rgba(22,32,53,0.95); border:1px solid var(--border);
+    background:#ffffff; border:1px solid var(--border);
     border-radius:12px; padding:20px; margin-bottom:20px;
   }
   .obs-action-title { font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--gold-light); margin-bottom:14px; }
@@ -1611,7 +1611,7 @@ async function loadReportForValidation() {
 
   // Show summary
   document.getElementById('val_reportSummary').innerHTML = `
-    <div style="margin-top:12px;padding:14px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--border)">
+    <div style="margin-top:12px;padding:14px;background:rgba(0,0,0,0.03);border-radius:8px;border:1px solid var(--border)">
       <div class="grid-4">
         <div><div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em">Week</div><div style="font-weight:700;color:var(--white)">${data.weekNum}</div></div>
         <div><div style="font-size:10px;color:var(--grey);text-transform:uppercase;letter-spacing:.05em">Period Ending</div><div style="font-weight:700;color:var(--white)">${data.weekEnding}</div></div>
@@ -1660,15 +1660,15 @@ function buildDailyValidationTable(daily) {
     <tr>
       <td class="bold">${r.date}</td>
       <td class="resort-cell">${r.arrivalTime||'—'}</td>
-      <td><input type="time" class="val-time-input" id="vat_arr_${i}" style="padding:5px 8px;font-size:12px;border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:rgba(39,174,96,0.06);color:var(--white)" title="Enter the arrival time you recorded on site"></td>
+      <td><input type="time" class="val-time-input" id="vat_arr_${i}" style="padding:5px 8px;font-size:12px;border:1px solid rgba(0,0,0,0.15);border-radius:6px;background:rgba(30,132,73,0.06);color:var(--white)" title="Enter the arrival time you recorded on site"></td>
       <td class="resort-cell">${r.ef||0}</td>
-      <td><input type="number" class="val-input" id="vef_${i}" value="" min="0" style="border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:rgba(39,174,96,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
+      <td><input type="number" class="val-input" id="vef_${i}" value="" min="0" style="border:1px solid rgba(0,0,0,0.15);border-radius:6px;background:rgba(30,132,73,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
       <td class="resort-cell">${r.cf||0}</td>
-      <td><input type="number" class="val-input" id="vcf_${i}" value="" min="0" style="border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:rgba(39,174,96,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
+      <td><input type="number" class="val-input" id="vcf_${i}" value="" min="0" style="border:1px solid rgba(0,0,0,0.15);border-radius:6px;background:rgba(30,132,73,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
       <td class="resort-cell">${r.zf||0}</td>
-      <td><input type="number" class="val-input" id="vzf_${i}" value="" min="0" style="border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:rgba(39,174,96,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
+      <td><input type="number" class="val-input" id="vzf_${i}" value="" min="0" style="border:1px solid rgba(0,0,0,0.15);border-radius:6px;background:rgba(30,132,73,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
       <td class="resort-cell">${r.gf||0}</td>
-      <td><input type="number" class="val-input" id="vgf_${i}" value="" min="0" style="border:1px solid rgba(255,255,255,0.1);border-radius:6px;background:rgba(39,174,96,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
+      <td><input type="number" class="val-input" id="vgf_${i}" value="" min="0" style="border:1px solid rgba(0,0,0,0.15);border-radius:6px;background:rgba(30,132,73,0.06);color:var(--white)" oninput="checkDailyDisc(${i},${r.ef||0},${r.cf||0},${r.zf||0},${r.gf||0})"></td>
       <td id="vdisc_${i}" style="font-size:11px;font-weight:600;color:var(--grey)">—</td>
     </tr>`).join('');
 }
@@ -1701,7 +1701,7 @@ function checkDailyDisc(i, ref_ef, ref_cf, ref_zf, ref_gf) {
 
 function buildCoValidationRows(coData) {
   document.getElementById('val_coRows').innerHTML = coData.map((r,i)=>`
-    <div style="display:flex;align-items:center;gap:16px;padding:12px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;margin-bottom:8px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:16px;padding:12px 16px;background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.08);border-radius:8px;margin-bottom:8px;flex-wrap:wrap">
       <div style="font-weight:600;font-size:13px;min-width:200px">${r.name}</div>
       <div style="font-size:12px;color:var(--grey)">Entry: <span style="color:var(--white)">${r.ef||0}</span></div>
       <div style="font-size:12px;color:var(--grey)">Chairlift: <span style="color:var(--white)">${r.cf||0}</span></div>
@@ -1709,7 +1709,7 @@ function buildCoValidationRows(coData) {
       <div style="font-size:12px;color:var(--grey)">Giant Swing: <span style="color:var(--white)">${r.gf||0}</span></div>
       <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
         <label style="font-size:11px;color:var(--grey)">Audit confirms?</label>
-        <select id="vco_${i}" style="padding:5px 10px;font-size:12px;background:rgba(39,174,96,0.06);border:1px solid rgba(39,174,96,0.3);border-radius:6px;color:var(--white)">
+        <select id="vco_${i}" style="padding:5px 10px;font-size:12px;background:rgba(30,132,73,0.06);border:1px solid rgba(30,132,73,0.3);border-radius:6px;color:var(--white)">
           <option value="">-- Confirm --</option>
           <option value="Confirmed">✅ Confirmed</option>
           <option value="Discrepancy — count differs">⚠ Count differs</option>
@@ -1772,7 +1772,7 @@ function previewValidation() {
 
   if (discs.length) {
     html += `<div style="font-size:11px;color:var(--grey);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em">Flagged Items:</div>`;
-    discs.forEach((d,i)=>{ html += `<div style="font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05)">${i+1}. <strong>${d.date} — ${d.activity}</strong> | Resort: ${d.resort||'—'} vs Audit: ${d.audit||'—'} | ${d.remarks||'—'}</div>`; });
+    discs.forEach((d,i)=>{ html += `<div style="font-size:12px;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.08)">${i+1}. <strong>${d.date} — ${d.activity}</strong> | Resort: ${d.resort||'—'} vs Audit: ${d.audit||'—'} | ${d.remarks||'—'}</div>`; });
   }
 
   if (remarks) html += `<div style="margin-top:10px;font-size:12px;color:var(--grey-light);font-style:italic">"${remarks}"</div>`;
@@ -2072,14 +2072,14 @@ function openUpdateModal(idx) {
 
   const modal = document.createElement('div');
   modal.id = 'obsUpdateModal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(13,27,42,0.92);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(245,243,238,0.92);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px';
   modal.innerHTML = `
-    <div style="background:var(--navy-mid);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto">
+    <div style="background:#ffffff;border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.12)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
         <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px">Update Observation #${r.sn}</div>
         <button onclick="document.getElementById('obsUpdateModal').remove()" style="background:transparent;border:none;color:var(--grey);font-size:20px;cursor:pointer">×</button>
       </div>
-      <div style="font-size:12px;color:var(--grey-light);margin-bottom:16px;line-height:1.6;padding:12px;background:rgba(255,255,255,0.04);border-radius:8px">${r.task}</div>
+      <div style="font-size:12px;color:var(--grey);margin-bottom:16px;line-height:1.6;padding:12px;background:rgba(0,0,0,0.03);border-radius:8px">${r.task}</div>
 
       <div class="section-divider" style="margin-top:0">Resort Team Response (filled by GM)</div>
       <div class="form-grid" style="margin-bottom:16px">
