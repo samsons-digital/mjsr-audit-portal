@@ -1858,16 +1858,17 @@ async function loadReports() {
 // ============================================================
 function renderConfig() {
   renderCoList(); renderSubmitterList();
-  document.getElementById('price_entry_wd').value = prices.wd.entry;
-  document.getElementById('price_chair_wd').value = prices.wd.chair;
-  document.getElementById('price_zip_wd').value   = prices.wd.zip;
-  document.getElementById('price_gs_wd').value    = prices.wd.gs;
-  document.getElementById('price_ss_wd').value    = prices.wd.ss;
-  document.getElementById('price_entry_we').value = prices.we.entry;
-  document.getElementById('price_chair_we').value = prices.we.chair;
-  document.getElementById('price_zip_we').value   = prices.we.zip;
-  document.getElementById('price_gs_we').value    = prices.we.gs;
-  document.getElementById('price_ss_we').value    = prices.we.ss;
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+  set('price_entry_wd', prices.wd.entry);
+  set('price_chair_wd', prices.wd.chair);
+  set('price_zip_wd',   prices.wd.zip);
+  set('price_gs_wd',    prices.wd.gs);
+  set('price_ss_wd',    prices.wd.ss);
+  set('price_entry_we', prices.we.entry);
+  set('price_chair_we', prices.we.chair);
+  set('price_zip_we',   prices.we.zip);
+  set('price_gs_we',    prices.we.gs);
+  set('price_ss_we',    prices.we.ss);
 }
 
 async function savePrices() {
@@ -2062,6 +2063,8 @@ function getPriceForDate(activity, dateStr) {
   const rate = isWeekend(dateStr) ? prices.we : prices.wd;
   return rate[activity] || 0;
 }
+
+function renderCoList() {
   document.getElementById('coList').innerHTML = coPersonnel.map((c,i)=>`
     <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
       <span>${c}</span>
