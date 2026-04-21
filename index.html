@@ -1897,11 +1897,11 @@ async function savePrices() {
   const labels = {entry:'Entry',chair:'Chairlift',zip:'Zipline',gs:'Giant Swing',ss:'Slingshot'};
   const changes = [];
   acts.forEach(a => {
-    if (newWd[a] !== prev.wd[a]) changes.push(`${labels[a]} WD: ${prev.wd[a]} → ${newWd[a]}`);
-    if (newWe[a] !== prev.we[a]) changes.push(`${labels[a]} WE: ${prev.we[a]} → ${newWe[a]}`);
+    if (newWd[a] !== Number(prev.wd[a])) changes.push(`${labels[a]} WD: ${prev.wd[a]} → ${newWd[a]}`);
+    if (newWe[a] !== Number(prev.we[a])) changes.push(`${labels[a]} WE: ${prev.we[a]} → ${newWe[a]}`);
   });
 
-  if (!changes.length) { toast('No price changes detected', 'info'); return; }
+  if (!changes.length) { toast('No price changes detected — values are the same as current', 'info'); return; }
 
   prices.wd = newWd;
   prices.we = newWe;
@@ -1911,7 +1911,7 @@ async function savePrices() {
     timestamp: new Date().toISOString(),
     reason,
     changes: changes.join(' | '),
-    changedBy: document.getElementById('f_submittedBy')?.value || 'Config',
+    changedBy: 'Config',
     prevWd: JSON.stringify(prev.wd),
     prevWe: JSON.stringify(prev.we),
     newWd: JSON.stringify(newWd),
@@ -1926,8 +1926,9 @@ async function savePrices() {
   toast(`Prices updated — ${changes.length} change${changes.length>1?'s':''} recorded in audit log`);
   renderPriceAuditLog();
 
-  // Update revenue calc if form is open
-  if (document.getElementById('f_weekEnding').value) onWeekEndingChange();
+  // Update revenue calc if form is open (safe null check)
+  const weekEndingEl = document.getElementById('f_weekEnding');
+  if (weekEndingEl && weekEndingEl.value) onWeekEndingChange();
 }
 
 function togglePriceLog() {
@@ -2099,15 +2100,6 @@ function addSubmitter() {
   document.getElementById('newSubmitter').value='';
   renderSubmitterList();
   toast(`Submitter "${v}" added`);
-}
-
-function savePrices() {
-  prices.entry = +document.getElementById('price_entry').value||2200;
-  prices.chair = +document.getElementById('price_chair').value||2800;
-  prices.zip = +document.getElementById('price_zip').value||5700;
-  prices.gs = +document.getElementById('price_gs').value||3500;
-  prices.ss = +document.getElementById('price_ss').value||5000;
-  toast('Ticket prices updated');
 }
 
 function changePin() {
