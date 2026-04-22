@@ -617,9 +617,7 @@
         </div>
         <div class="form-group">
           <label>Submitted By *</label>
-          <select id="f_submittedBy">
-            <option value="">-- Select --</option>
-          </select>
+          <input type="text" id="f_submittedBy" placeholder="Enter your name" autocomplete="off">
         </div>
         <div class="form-group">
           <label>Submission Date</label>
@@ -1441,9 +1439,7 @@ function formatPKR(v) {
 // FORM — ENTRY CARDS
 // ============================================================
 function renderCoDropdown() {
-  const el = document.getElementById('f_submittedBy');
-  if (el) el.innerHTML = '<option value="">-- Select --</option>' +
-    submitters.map(s=>`<option value="${s}">${s}</option>`).join('');
+  // f_submittedBy is now a free text input — nothing to populate
 }
 
 // kept for backward compat — no longer pre-fills the form
